@@ -1,0 +1,18 @@
+from https://twiki.cern.ch/twiki/bin/viewauth/CMS/ConstructionDB
+
+Client script/module is available from these locations:
+
+GPN: /afs/cern.ch/user/v/valdo/public/rhapi.py
+Web: wget https://raw.githubusercontent.com/valdasraps/resthub/master/clients/python/src/main/python/rhapi.py
+
+Lightweight user login
+In case you do not have CERN account or intend to use it for application permanent access, please request CERN Lightweight account from https://account.cern.ch/account/Externals/RegisterAccount.aspx
+
+Request account to be added to certain e-group if needed (see above). Make sure you have required dependencies installed, i.e.
+
+sudo pip3 install requests ilock
+Execute upload job. During the first execution the script the will ask username and password. Both will be cached (stored) in a file .session.cache for other consequent uses. Cookies once expired will be refreshed automatically:
+
+python3 cmsdbldr_client.py --login --url=https://cmsdca.cern.ch/trk_loader/trker/int2r LoadTrackerUmJoSensorWafers.xml
+
+python3 rhapi.py --login --url=https://cmsdca.cern.ch/trk_rhapi
