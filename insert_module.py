@@ -1,7 +1,11 @@
 from pymongo import MongoClient
 import json
 from jsonschema import validate, ValidationError
+from dotenv import load_dotenv
+import os
 
+username = os.environ.get('MONGO_USERNAME')
+password = os.environ.get('MONGO_PASSWORD')
 
 def insert_module(data, schema=None):
     try:
@@ -13,7 +17,7 @@ def insert_module(data, schema=None):
 
 
 if __name__ == '__main__':
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient(f'mongodb://{username}:{password}@localhost:27017')
     db = client['test_db']
 
     modules_collection = db['modules']
