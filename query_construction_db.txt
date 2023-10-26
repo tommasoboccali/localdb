@@ -16,3 +16,6 @@ Execute upload job. During the first execution the script the will ask username 
 python3 cmsdbldr_client.py --login --url=https://cmsdca.cern.ch/trk_loader/trker/int2r LoadTrackerUmJoSensorWafers.xml
 
 python3 rhapi.py --login --url=https://cmsdca.cern.ch/trk_rhapi
+
+### QUERY
+python3 rhapi.py --url=http://dbloader-tracker:8113 "select * from trker_cmsr.parts p where p.name_label = :name_label" -pname_label="PS_40_05_IBA-00001" --all
