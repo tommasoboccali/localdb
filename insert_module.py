@@ -7,6 +7,7 @@ import os
 load_dotenv('mongo.env')
 username = os.environ.get('MONGO_USERNAME')
 password = os.environ.get('MONGO_PASSWORD')
+db_name = os.environ.get('MONGO_DB_NAME')
 
 def insert_module(data, schema=None):
     try:
@@ -19,8 +20,8 @@ def insert_module(data, schema=None):
 
 if __name__ == '__main__':
     print(f'username: {username}, password: {password}')
-    client = MongoClient(f'mongodb://{username}:{password}@localhost:27017')
-    db = client['test_db']
+    client = MongoClient(f'mongodb://{username}:{password}@localhost:27017/{db_name}')
+    db = client[db_name]
 
     modules_collection = db['modules']
     with open('module_schema.json', 'r') as f:
