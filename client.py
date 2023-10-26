@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QFormLayout,
     QMessageBox,
     QListWidget,
+    QTextEdit
 )
 from PyQt5.QtCore import Qt
 from pymongo import MongoClient
@@ -133,13 +134,32 @@ class BrowseScreen(QWidget):
 
         layout = QVBoxLayout()
 
-        self.list_widget = QListWidget()
-        for module in db.modules.find():
-            self.list_widget.addItem(f"Module: {module['inventory']} - Position: {module['position']}")
+        # Search Bar
+        self.search_bar = QLineEdit()
+        layout.addWidget(QLabel("Search by Inventory:"))
+        layout.addWidget(self.search_bar)
 
-        layout.addWidget(self.list_widget)
+        # Search Button
+        search_button = QPushButton("Search")
+        search_button.clicked.connect(self.search_module)
+        layout.addWidget(search_button)
+
+        # Display Area
+        self.result_area = QTextEdit()
+        self.result_area.setReadOnly(True)
+        layout.addWidget(self.result_area)
+
         self.setLayout(layout)
         self.setWindowTitle('Browse Screen')
+
+    def search_module(self):
+        search_inventory = self.search_bar.text()
+        query_result = db.modules.find_one({"inventory": search_inventory})
+
+        if query_result:
+            self.result_area.setText(str(query_result))
+        else:
+            self.result_area.setText("No module found with the specified inventory.")
 
 class ModifyScreen(QWidget):
     def __init__(self):
