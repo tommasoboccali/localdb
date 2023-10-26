@@ -18,6 +18,7 @@ def insert_module(data, schema=None):
 
 
 if __name__ == '__main__':
+    print(f'username: {username}, password: {password}')
     client = MongoClient(f'mongodb://{username}:{password}@localhost:27017')
     db = client['test_db']
 
