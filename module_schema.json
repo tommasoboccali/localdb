@@ -1,0 +1,14 @@
+{
+    "type": "object",
+    "properties": {
+      "inventory": { "type": "string" },
+      "position": { "type": "string" },
+      "logbook": { "type": "object" },
+      "local_logbook": { "type": "object" },
+      "ref_to_global_logbook": { "type": "array" },
+      "status": { "type": "string" },
+      "overall_grade": { "type": "string" }
+    },
+    "required": ["inventory", "position", "status"]
+  }
+  
