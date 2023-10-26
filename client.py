@@ -92,7 +92,7 @@ class InsertScreen(QWidget):
 
         try:
             # Validate the data against the schema
-            validate(instance=data_to_insert, schema=schema)
+            validate(instance=data_to_insert, schema=module_schema)
 
             # If validation succeeds, insert into MongoDB
             db.modules.insert_one(data_to_insert)
