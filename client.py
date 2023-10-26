@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QFormLayout,
     QMessageBox,
+    QListWidget,
 )
 from PyQt5.QtCore import Qt
 from pymongo import MongoClient
