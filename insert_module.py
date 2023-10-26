@@ -3,9 +3,9 @@ import json
 from jsonschema import validate, ValidationError
 
 
-def insert_module(data):
+def insert_module(data, schema=None):
     try:
-        validate(instance=data, schema=None)
+        validate(instance=data, schema=schema)
         modules_collection.insert_one(data)
         print("Insert successful")
     except ValidationError as e:
