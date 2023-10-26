@@ -151,6 +151,16 @@ class BrowseScreen(QWidget):
 
         self.setLayout(layout)
         self.setWindowTitle('Browse Screen')
+        
+        fetch_button = QPushButton('Fetch Modules')
+        fetch_button.clicked.connect(self.fetch_modules)
+        layout.addWidget(fetch_button)
+
+
+    def fetch_modules(self):
+        self.list_widget.clear()
+        for module in db.modules.find():
+            self.list_widget.addItem(f"Module: {module['inventory']} - Position: {module['position']}")
 
     def search_module(self):
         search_inventory = self.search_bar.text()
