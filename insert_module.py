@@ -4,7 +4,7 @@ from jsonschema import validate, ValidationError
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv('mongo.env')
 username = os.environ.get('MONGO_USERNAME')
 password = os.environ.get('MONGO_PASSWORD')
 
