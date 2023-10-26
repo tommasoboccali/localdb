@@ -5,7 +5,7 @@ from jsonschema import validate, ValidationError
 
 def insert_module(data):
     try:
-        validate(instance=data, schema=schema)
+        validate(instance=data, schema=None)
         modules_collection.insert_one(data)
         print("Insert successful")
     except ValidationError as e:
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         "overall_grade": "A"
     }
 
-    insert_module(sample_module_data)
+    insert_module(sample_module_data, module_schema)
 
     # print all documents in the collection
     for doc in modules_collection.find():
