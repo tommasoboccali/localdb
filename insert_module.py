@@ -9,6 +9,7 @@ username = os.environ.get('MONGO_USERNAME')
 password = os.environ.get('MONGO_PASSWORD')
 db_name = os.environ.get('MONGO_DB_NAME')
 
+
 def insert_module(data, schema=None):
     try:
         validate(instance=data, schema=schema)
