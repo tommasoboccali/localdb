@@ -77,7 +77,7 @@ class TestAPI(TestCase):
             "Type": "TestType"
         }
 
-        response = self.test_app.post('/current_cabling_map', json=test_data)
+        response = self.client.post('/current_cabling_map', json=test_data)
         self.assertEqual(response.status_code, 201)
 
         inserted_data = self.collection.find_one({"ID": "TestID"})
@@ -89,7 +89,7 @@ class TestAPI(TestCase):
             "detSide": [{"channel": 1}]
         }
 
-        response = self.test_app.post('/current_cabling_map', json=test_data)
+        response = self.client.post('/current_cabling_map', json=test_data)
         self.assertEqual(response.status_code, 400)
 
     def test_get_cabling_map(self):
@@ -101,7 +101,7 @@ class TestAPI(TestCase):
         }
         self.collection.insert_one(test_data)
 
-        response = self.test_app.get('/current_cabling_map/TestID')
+        response = self.client.get('/current_cabling_map/TestID')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'TestID', response.data)
 
