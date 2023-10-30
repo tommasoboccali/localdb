@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from pymongo import MongoClient
+from bson import json_util
 from jsonschema import validate, ValidationError
 import pymongo
 import os
@@ -226,7 +227,7 @@ class CurrentCablingMapResource(Resource):
         if ID:
             entry = current_cabling_map_collection.find_one({"ID": ID})
             if entry:
-                return jsonify(entry)
+                return json.dumps(entry, default=json_util.default)
             else:
                 return {"message": "Entry not found"}, 404
         else:
