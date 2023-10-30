@@ -28,7 +28,7 @@
     "module": {
         "type": "object",
         "properties": {
-            "inventory": {
+            "moduleID": {
                 "type": "string"
             },
             "position": {

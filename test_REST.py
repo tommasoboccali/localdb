@@ -14,10 +14,10 @@ class TestAPI(TestCase):
         }
         return app
 
-    # def setUp(self):
-    #     db.modules.drop()
-    #     db.logbook.drop()
-    #     db.current_cabling_map.drop()
+    def setUp(self):
+        db.modules.drop()
+        db.logbook.drop()
+        db.current_cabling_map.drop()
 
 
     # def tearDown(self):

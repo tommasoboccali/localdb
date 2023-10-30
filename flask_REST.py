@@ -44,18 +44,18 @@ class ModulesResource(Resource):
         Resource (Resource): Flask RESTful Resource
     """
 
-    def get(self, inventory=None):
+    def get(self, moduleID=None):
         """
-        Retrieves a module from the database based on its inventory number, or retrieves all modules if no inventory number is provided.
+        Retrieves a module from the database based on its moduleID number, or retrieves all modules if no moduleID number is provided.
 
         Args:
-            inventory (int, optional): The inventory number of the module to retrieve. Defaults to None.
+            moduleID (int, optional): The moduleID number of the module to retrieve. Defaults to None.
 
         Returns:
-            If inventory is provided, returns a JSON representation of the module. If inventory is not provided, returns a JSON representation of all modules in the database.
+            If moduleID is provided, returns a JSON representation of the module. If moduleID is not provided, returns a JSON representation of all modules in the database.
         """
-        if inventory:
-            module = modules_collection.find_one({"inventory": inventory})
+        if moduleID:
+            module = modules_collection.find_one({"moduleID": moduleID})
             if module:
                 module["_id"] = str(module["_id"]) # convert ObjectId to string
                 return jsonify(module)
@@ -83,36 +83,36 @@ class ModulesResource(Resource):
         except ValidationError as e:
             return {"message": str(e)}, 400
 
-    def put(self, inventory):
+    def put(self, moduleID):
         """
         Updates an existing module in the database.
 
         Args:
-            inventory (int): The inventory number of the module to update.
+            moduleID (int): The moduleID number of the module to update.
 
         Returns:
             If the module is successfully updated, returns a message indicating success.
         """
         updated_data = request.get_json()
-        modules_collection.update_one({"inventory": inventory}, {"$set": updated_data})
+        modules_collection.update_one({"moduleID": moduleID}, {"$set": updated_data})
         return {"message": "Module updated"}, 200
 
-    def delete(self, inventory):
+    def delete(self, moduleID):
         """
         Deletes an existing module from the database.
 
         Args:
-            inventory (int): The inventory number of the module to delete.
+            moduleID (int): The moduleID number of the module to delete.
 
         Returns:
             If the module is successfully deleted, returns a message indicating success.
         """
-        modules_collection.delete_one({"inventory": inventory})
+        modules_collection.delete_one({"moduleID": moduleID})
         return {"message": "Module deleted"}, 200
 
 
 # API Routes
-api.add_resource(ModulesResource, "/modules", "/modules/<string:inventory>")
+api.add_resource(ModulesResource, "/modules", "/modules/<string:moduleID>")
 
 
 class LogbookResource(Resource):
