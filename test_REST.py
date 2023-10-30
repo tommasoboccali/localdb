@@ -29,16 +29,16 @@ class TestAPI(TestCase):
             # ... (other properties)
         }
         response = self.client.post("/modules", json=new_module)
-        self.assert201(response)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, {"message": "Module inserted"})
 
     def test_fetch_specific_module_not_found(self):
         response = self.client.get("/modules/INV999")
-        self.assert404(response)
+        self.assertEqual(response.status_code, 404)
 
     def test_delete_module_not_found(self):
         response = self.client.delete("/modules/INV999")
-        self.assert200(response)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Module deleted"})
 
 
