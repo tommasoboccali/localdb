@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 from bson import json_util
@@ -57,7 +57,9 @@ class ModulesResource(Resource):
         if inventory:
             module = modules_collection.find_one({"inventory": inventory})
             if module:
-                return json.dumps(module, default=json_util.default)
+                module["_id"] = str(module["_id"])
+                return jsonify(module)
+                # return json.dumps(module, default=json_util.default)
             else:
                 return {"message": "Module not found"}, 404
         else:
