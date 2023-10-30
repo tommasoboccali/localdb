@@ -83,7 +83,7 @@ class TestAPI(TestCase):
         response = self.client.post('/current_cabling_map', json=test_data)
         self.assertEqual(response.status_code, 201)
 
-        inserted_data = self.collection.find_one({"ID": "TestID"})
+        inserted_data = self.client.get('/current_cabling_map/TestID')
         self.assertIsNotNone(inserted_data)
 
     def test_invalid_cabling_map(self):
