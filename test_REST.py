@@ -32,7 +32,7 @@ class TestAPI(TestCase):
 
     def test_insert_module(self):
         new_module = {
-            "inventory": "INV001",
+            "moduleID": "INV001",
             "position": "cleanroom",
             "status": "readyformount",
             # ... (other properties)

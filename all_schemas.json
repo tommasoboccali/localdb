@@ -51,7 +51,7 @@
             }
         },
         "required": [
-            "inventory",
+            "moduleID",
             "position",
             "status"
         ]
