@@ -37,6 +37,14 @@ current_cabling_map_collection = db["current_cabling_map"]
 connection_snapshot_collection = db["connection_snapshot"]
 tests_collection = db["tests"]
 
+# at the start, empty the collections modules, logbook, current_cabling_map, tests
+modules_collection.drop()
+logbook_collection.drop()
+current_cabling_map_collection.drop()
+connection_snapshot_collection.drop()
+tests_collection.drop()
+
+
 # Populate modules
 module_ids = []
 for i in range(1000):  # Creating 100 random modules
@@ -61,3 +69,12 @@ for i in range(500):  # Creating 50 random tests
         "testResults": {"result": random.choice(["pass", "fail"])}
     }
     tests_collection.insert_one(test)
+
+# print 10 random entries to show that the database is populated
+print("Modules:")
+for module in modules_collection.aggregate([{"$sample": {"size": 10}}]):
+    print(json.dumps(module, indent=2, default=json_util.default))
+
+print("Tests:")
+for test in tests_collection.aggregate([{"$sample": {"size": 10}}]):
+    print(json.dumps(test, indent=2, default=json_util.default))
