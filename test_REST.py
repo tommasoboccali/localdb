@@ -14,10 +14,10 @@ class TestAPI(TestCase):
         }
         return app
 
-    def setUp(self):
+    def setUpModules(self):
         db.modules.drop()
 
-    def tearDown(self):
+    def tearDownModules(self):
         db.modules.drop()
 
     def test_fetch_all_modules_empty(self):
@@ -44,6 +44,9 @@ class TestAPI(TestCase):
         response = self.client.delete("/modules/INV999")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Module deleted"})
+
+    def tearDownLogbook(self):
+        db.logbook.drop()
 
     def test_insert_log(self):
         new_log = {"timestamp": "2023-11-03T14:21:29Z", "event": "Module added", "operator": "John Doe"}
@@ -99,8 +102,7 @@ class TestAPI(TestCase):
             "crateSide": "TestCrate",
             "Type": "TestType"
         }
-        self.collection.insert_one(test_data)
-
+        self.client.post('/current_cabling_map', json=test_data)
         response = self.client.get('/current_cabling_map/TestID')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'TestID', response.data)
