@@ -44,6 +44,7 @@ class TestAPI(TestCase):
         response = self.client.get("/modules/INV001")
         self.assertEqual(response.status_code, 200)
         print(response.json)
+        print(type(response.json))
         self.assertEqual(response.json["inventory"], "INV001")       
 
     def test_fetch_specific_module_not_found(self):
