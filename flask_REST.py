@@ -14,6 +14,10 @@ api = Api(app)
 with open("module_schema.json", "r") as f:
     schema = json.load(f)
 
+
+with open("logbook_schema.json", "r") as f:
+    logbook_schema = json.load(f)
+
 load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
@@ -26,6 +30,7 @@ db = client[db_name]
 # db = client['test']
 # we also have a collection called "modules" from the previous example
 # modules_collection = db['modules']
+logbook_collection = db["logbook"]
 
 
 class ModulesResource(Resource):
@@ -76,6 +81,48 @@ class ModulesResource(Resource):
 
 # API Routes
 api.add_resource(ModulesResource, "/modules", "/modules/<string:inventory>")
+
+
+class LogbookResource(Resource):
+    def get(self, timestamp=None):
+        if timestamp:
+            log = logbook_collection.find_one({"timestamp": timestamp})
+            if log:
+                return jsonify(log)
+            else:
+                return {"message": "Log not found"}, 404
+        else:
+            logs = list(logbook_collection.find())
+            return jsonify(logs)
+
+    def post(self):
+        try:
+            new_log = request.get_json()
+            validate(instance=new_log, schema=logbook_schema)
+            logbook_collection.insert_one(new_log)
+            return {"message": "Log inserted"}, 201
+        except ValidationError as e:
+            return {"message": str(e)}, 400
+        
+    def put(self, timestamp):
+        updated_data = request.get_json()
+        logbook_collection.update_one({"timestamp": timestamp}, {"$set": updated_data})
+        return {"message": "Log updated"}, 200
+    
+    # Inside the LogbookResource class
+    def delete(self, timestamp):
+        log = logbook_collection.find_one({"timestamp": timestamp})
+        if log:
+            logbook_collection.delete_one({"timestamp": timestamp})
+            return {"message": "Log deleted"}, 200
+        else:
+            return {"message": "Log not found"}, 404
+
+
+
+# API Routes
+api.add_resource(LogbookResource, "/logbook", "/logbook/<string:timestamp>")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
