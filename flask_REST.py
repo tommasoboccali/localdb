@@ -57,14 +57,16 @@ class ModulesResource(Resource):
         if inventory:
             module = modules_collection.find_one({"inventory": inventory})
             if module:
-                module["_id"] = str(module["_id"])
+                module["_id"] = str(module["_id"]) # convert ObjectId to string
                 return jsonify(module)
                 # return json.dumps(module, default=json_util.default)
             else:
                 return {"message": "Module not found"}, 404
         else:
             modules = list(modules_collection.find())
-            return json.dumps(modules, default=json_util.default)
+            for module in modules:
+                module["_id"] = str(module["_id"])
+            return jsonify(modules)
 
     def post(self):
         """
@@ -153,12 +155,15 @@ class LogbookResource(Resource):
         if timestamp:
             log = logbook_collection.find_one({"timestamp": timestamp})
             if log:
-                return json.dumps(log, default=json_util.default)
+                log["_id"] = str(log["_id"]) # convert ObjectId to string
+                return jsonify(log)
             else:
                 return {"message": "Log not found"}, 404
         else:
             logs = list(logbook_collection.find())
-            return json.dumps(logs, default=json_util.default)
+            for log in logs:
+                log["_id"] = str(log["_id"])
+            return jsonify(logs)
 
     def post(self):
         """
@@ -229,12 +234,15 @@ class CurrentCablingMapResource(Resource):
         if ID:
             entry = current_cabling_map_collection.find_one({"ID": ID})
             if entry:
-                return json.dumps(entry, default=json_util.default)
+                entry["_id"] = str(entry["_id"]) # convert ObjectId to string
+                return jsonify(entry)
             else:
                 return {"message": "Entry not found"}, 404
         else:
             entries = list(current_cabling_map_collection.find())
-            return json.dumps(entries, default=json_util.default)
+            for entry in entries:
+                entry["_id"] = str(entry["_id"])
+            return jsonify(entries)
 
     def post(self):
         try:
