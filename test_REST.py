@@ -139,9 +139,18 @@ class TestAPI(TestCase):
 
     def test_delete_test(self):
         # Delete
+        new_test = {
+            "testID": "T001",
+            "modules_list": ["M1", "M2"],
+            "testType": "Type1",
+            "testDate": "2023-11-01",
+            "testStatus": "completed",
+            "testResults": {}
+        }
+
+        # Insert
+        insert = self.client.post("/tests", json=new_test)
         response = self.client.delete("/tests/T001")
-        response1 = self.client.get("/tests/T001")
-        print(response1)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"message": "Entry deleted"})
 
