@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 from bson import json_util
@@ -57,12 +57,12 @@ class ModulesResource(Resource):
         if inventory:
             module = modules_collection.find_one({"inventory": inventory})
             if module:
-                return jsonify(module)
+                return json.dumps(module, default=json_util.default)
             else:
                 return {"message": "Module not found"}, 404
         else:
             modules = list(modules_collection.find())
-            return jsonify(modules)
+            return json.dumps(modules, default=json_util.default)
 
     def post(self):
         """
@@ -151,12 +151,12 @@ class LogbookResource(Resource):
         if timestamp:
             log = logbook_collection.find_one({"timestamp": timestamp})
             if log:
-                return jsonify(log)
+                return json.dumps(log, default=json_util.default)
             else:
                 return {"message": "Log not found"}, 404
         else:
             logs = list(logbook_collection.find())
-            return jsonify(logs)
+            return json.dumps(logs, default=json_util.default)
 
     def post(self):
         """
@@ -232,7 +232,7 @@ class CurrentCablingMapResource(Resource):
                 return {"message": "Entry not found"}, 404
         else:
             entries = list(current_cabling_map_collection.find())
-            return jsonify(entries)
+            return json.dumps(entries, default=json_util.default)
 
     def post(self):
         try:
