@@ -318,6 +318,7 @@ class TestsResource(Resource):
 
     def delete(self, testID):
         if testID:
+            print(testID)
             entry = tests_collection.find_one({"testID": testID})
             if entry:
                 tests_collection.delete_one({"testID": testID})
