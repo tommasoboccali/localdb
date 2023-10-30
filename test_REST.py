@@ -134,14 +134,14 @@ class TestAPI(TestCase):
         # Retrieve
         response = self.client.get("/tests/T001")
         retrieved_test = response.get_json()
-        print(retrieved_test)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(retrieved_test['testID'], "T001")
 
     def test_delete_test(self):
         # Delete
         response = self.client.delete("/tests/T001")
-        print(response)
+        response1 = self.client.get("/tests/T001")
+        print(response1)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"message": "Entry deleted"})
 
