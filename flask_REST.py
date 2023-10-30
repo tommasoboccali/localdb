@@ -17,8 +17,9 @@ with open("all_schemas.json", "r") as f:
 
 module_schema = all_schemas["module"]
 logbook_schema = all_schemas["logbook"]
-current_cabling_map_schema = all_schemas['CurrentCablingMap']
-connection_snapshot_schema = all_schemas['ConnectionSnapshot']
+current_cabling_map_schema = all_schemas["CurrentCablingMap"]
+connection_snapshot_schema = all_schemas["ConnectionSnapshot"]
+tests_schema = all_schemas["tests"]
 
 load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
@@ -31,10 +32,11 @@ db = client[db_name]
 # we already have a database called "test" from the previous example
 # db = client['test']
 # we also have a collection called "modules" from the previous example
-modules_collection = db['modules']
+modules_collection = db["modules"]
 logbook_collection = db["logbook"]
-current_cabling_map_collection = db['current_cabling_map']
-connection_snapshot_collection = db['connection_snapshot']
+current_cabling_map_collection = db["current_cabling_map"]
+connection_snapshot_collection = db["connection_snapshot"]
+tests_collection = db["tests"]
 
 
 class ModulesResource(Resource):
@@ -57,7 +59,7 @@ class ModulesResource(Resource):
         if moduleID:
             module = modules_collection.find_one({"moduleID": moduleID})
             if module:
-                module["_id"] = str(module["_id"]) # convert ObjectId to string
+                module["_id"] = str(module["_id"])  # convert ObjectId to string
                 return jsonify(module)
                 # return json.dumps(module, default=json_util.default)
             else:
@@ -155,7 +157,7 @@ class LogbookResource(Resource):
         if timestamp:
             log = logbook_collection.find_one({"timestamp": timestamp})
             if log:
-                log["_id"] = str(log["_id"]) # convert ObjectId to string
+                log["_id"] = str(log["_id"])  # convert ObjectId to string
                 return jsonify(log)
             else:
                 return {"message": "Log not found"}, 404
@@ -229,12 +231,13 @@ class LogbookResource(Resource):
 # API Routes
 api.add_resource(LogbookResource, "/logbook", "/logbook/<string:timestamp>")
 
+
 class CurrentCablingMapResource(Resource):
     def get(self, ID=None):
         if ID:
             entry = current_cabling_map_collection.find_one({"ID": ID})
             if entry:
-                entry["_id"] = str(entry["_id"]) # convert ObjectId to string
+                entry["_id"] = str(entry["_id"])  # convert ObjectId to string
                 return jsonify(entry)
             else:
                 return {"message": "Entry not found"}, 404
@@ -252,15 +255,17 @@ class CurrentCablingMapResource(Resource):
             return {"message": "Entry inserted"}, 201
         except ValidationError as e:
             return {"message": str(e)}, 400
-        
+
     def put(self, ID):
         if ID:
             updated_data = request.get_json()
-            current_cabling_map_collection.update_one({"ID": ID}, {"$set": updated_data})
+            current_cabling_map_collection.update_one(
+                {"ID": ID}, {"$set": updated_data}
+            )
             return {"message": "Entry updated"}, 200
         else:
             return {"message": "Entry not found"}, 404
-        
+
     def delete(self, ID):
         if ID:
             entry = current_cabling_map_collection.find_one({"ID": ID})
@@ -271,9 +276,58 @@ class CurrentCablingMapResource(Resource):
                 return {"message": "Entry not found"}, 404
         else:
             return {"message": "Entry not found"}, 404
-    
 
-api.add_resource(CurrentCablingMapResource, "/current_cabling_map", "/current_cabling_map/<string:ID>")
+
+api.add_resource(
+    CurrentCablingMapResource,
+    "/current_cabling_map",
+    "/current_cabling_map/<string:ID>",
+)
+
+class TestsResource(Resource):
+    def get(self, testID=None):
+        if testID:
+            entry = tests_collection.find_one({"testID": testID})
+            if entry:
+                entry["_id"] = str(entry["_id"])  # convert ObjectId to string
+                return jsonify(entry)
+            else:
+                return {"message": "Entry not found"}, 404
+        else:
+            entries = list(tests_collection.find())
+            for entry in entries:
+                entry["_id"] = str(entry["_id"])
+            return jsonify(entries)
+
+    def post(self):
+        try:
+            new_entry = request.get_json()
+            validate(instance=new_entry, schema=tests_schema)
+            tests_collection.insert_one(new_entry)
+            return {"message": "Entry inserted"}, 201
+        except ValidationError as e:
+            return {"message": str(e)}, 400
+
+    def put(self, testID):
+        if testID:
+            updated_data = request.get_json()
+            tests_collection.update_one({"testID": testID}, {"$set": updated_data})
+            return {"message": "Entry updated"}, 200
+        else:
+            return {"message": "Entry not found"}, 404
+
+    def delete(self, testID):
+        if testID:
+            entry = tests_collection.find_one({"testID": testID})
+            if entry:
+                tests_collection.delete_one({"testID": testID})
+                return {"message": "Entry deleted"}, 200
+            else:
+                return {"message": "Entry not found"}, 404
+        else:
+            return {"message": "Entry not found"}, 404
+
+api.add_resource(TestsResource, "/tests", "/tests/<string:testID>")
 
 if __name__ == "__main__":
     app.run(debug=True)

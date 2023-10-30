@@ -18,12 +18,13 @@ class TestAPI(TestCase):
         db.modules.drop()
         db.logbook.drop()
         db.current_cabling_map.drop()
-
+        db.tests.drop()
 
     # def tearDown(self):
     #     db.modules.drop()
     #     db.logbook.drop()
     #     db.current_cabling_map.drop()
+    #     db.tests.drop()
 
     def test_fetch_all_modules_empty(self):
         response = self.client.get("/modules")
@@ -115,6 +116,36 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'TestID', response.data)
 
+    def test_insert_and_retrieve_test(self):
+        new_test = {
+            "testID": "T001",
+            "modules_list": ["M1", "M2"],
+            "testType": "Type1",
+            "testDate": "2023-11-01",
+            "testStatus": "completed",
+            "testResults": {}
+        }
+
+        # Insert
+        response = self.client.post("/tests", json=new_test)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.get_json(), {"message": "Entry inserted"})
+
+        # Retrieve
+        response = self.client.get("/tests/T001")
+        retrieved_test = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(retrieved_test['testID'], "T001")
+
+    def test_delete_test(self):
+        # Delete
+        response = self.client.delete("/tests/T001")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"message": "Entry deleted"})
+
+        # Verify Deletion
+        response = self.client.get("/tests/T001")
+        self.assertEqual(response.status_code, 404)
 
 if __name__ == "__main__":
     unittest.main()

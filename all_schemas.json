@@ -83,26 +83,66 @@
         ]
     },
 
-    "ConnectionSnapshot": {
+    "tests" : {
         "type": "object",
-        "properties": {
-            "First": {
+        "properties":   {
+            "testID": {
                 "type": "string"
             },
-            "Last": {
-                "type": "string"
-            },
-            "Chain": {
+            "modules_list": {
                 "type": "array",
                 "items": {
                     "type": "string"
                 }
+            },
+            "testType": {
+                "type": "string"
+            },
+            "testDate": {
+                "type": "string"
+            },
+            "testOperator": {
+                "type": "string"
+            },
+            "testStatus": {
+                "type": "string"
+            },
+            "testResults": {
+                "type": "object"
             }
         },
         "required": [
-            "First",
-            "Last",
-            "Chain"
+            "testID",
+            "testType",
+            "modules_list",
+            "testDate",
+            "testStatus",
+            "testResults"
         ]
+        },
+
+        "ConnectionSnapshot": {
+            "type": "object",
+            "properties": {
+                "First": {
+                    "type": "string"
+                },
+                "Last": {
+                    "type": "string"
+                },
+                "Chain": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "First",
+                "Last",
+                "Chain"
+            ]
+        }
     }
-}
+
+    
