@@ -25,7 +25,8 @@ class TestAPI(TestCase):
     def test_insert_module(self):
         new_module = {
             "inventory": "INV001",
-            "position": "A1"
+            "position": "cleanroom",
+            "status": "readyformount",
             # ... (other properties)
         }
         response = self.client.post("/modules", json=new_module)
