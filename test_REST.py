@@ -140,6 +140,7 @@ class TestAPI(TestCase):
     def test_delete_test(self):
         # Delete
         response = self.client.delete("/tests/T001")
+        print(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"message": "Entry deleted"})
 
