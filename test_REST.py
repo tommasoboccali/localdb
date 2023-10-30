@@ -20,11 +20,11 @@ class TestAPI(TestCase):
         db.current_cabling_map.drop()
         db.tests.drop()
 
-    # def tearDown(self):
-    #     db.modules.drop()
-    #     db.logbook.drop()
-    #     db.current_cabling_map.drop()
-    #     db.tests.drop()
+    def tearDown(self):
+        db.modules.drop()
+        db.logbook.drop()
+        db.current_cabling_map.drop()
+        db.tests.drop()
 
     def test_fetch_all_modules_empty(self):
         response = self.client.get("/modules")
