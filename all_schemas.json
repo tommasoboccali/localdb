@@ -1,0 +1,108 @@
+{
+    "logbook": {
+        "type": "object",
+        "properties": {
+            "timestamp": {
+                "type": "string",
+                "format": "date-time"
+            },
+            "event": {
+                "type": "string"
+            },
+            "details": {
+                "type": "string"
+            },
+            "involved_modules": {
+                "type": "array"
+            },
+            "operator": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "timestamp",
+            "operator"
+        ]
+    },
+    
+    "module": {
+        "type": "object",
+        "properties": {
+            "inventory": {
+                "type": "string"
+            },
+            "position": {
+                "type": "string"
+            },
+            "logbook": {
+                "type": "object"
+            },
+            "local_logbook": {
+                "type": "object"
+            },
+            "ref_to_global_logbook": {
+                "type": "array"
+            },
+            "status": {
+                "type": "string"
+            },
+            "overall_grade": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "inventory",
+            "position",
+            "status"
+        ]
+    },
+    "CurrentCablingMap": {
+        "type": "object",
+        "properties": {
+            "ID": {
+                "type": "string"
+            },
+            "detSide": {
+                "type": "array",
+                "items": {
+                    "type": "object"
+                }
+            },
+            "crateSide": {
+                "type": "string"
+            },
+            "Type": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "ID",
+            "detSide",
+            "crateSide",
+            "Type"
+        ]
+    },
+
+    "ConnectionSnapshot": {
+        "type": "object",
+        "properties": {
+            "First": {
+                "type": "string"
+            },
+            "Last": {
+                "type": "string"
+            },
+            "Chain": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
+        "required": [
+            "First",
+            "Last",
+            "Chain"
+        ]
+    }
+}

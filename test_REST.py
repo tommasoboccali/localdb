@@ -69,6 +69,42 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Log deleted"})
 
+    def test_insert_cabling_map(self):
+        test_data = {
+            "ID": "TestID",
+            "detSide": [{"channel": 1}],
+            "crateSide": "TestCrate",
+            "Type": "TestType"
+        }
+
+        response = self.test_app.post('/current_cabling_map', json=test_data)
+        self.assertEqual(response.status_code, 201)
+
+        inserted_data = self.collection.find_one({"ID": "TestID"})
+        self.assertIsNotNone(inserted_data)
+
+    def test_invalid_cabling_map(self):
+        test_data = {
+            "ID": "TestID",
+            "detSide": [{"channel": 1}]
+        }
+
+        response = self.test_app.post('/current_cabling_map', json=test_data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_cabling_map(self):
+        test_data = {
+            "ID": "TestID",
+            "detSide": [{"channel": 1}],
+            "crateSide": "TestCrate",
+            "Type": "TestType"
+        }
+        self.collection.insert_one(test_data)
+
+        response = self.test_app.get('/current_cabling_map/TestID')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'TestID', response.data)
+
 
 if __name__ == "__main__":
     unittest.main()
