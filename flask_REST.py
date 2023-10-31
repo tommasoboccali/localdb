@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
-from flask.json import JSONEncoder
+from json import JSONEncoder
 from pymongo import MongoClient
 from bson import json_util, ObjectId
 from jsonschema import validate, ValidationError
