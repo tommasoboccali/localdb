@@ -98,11 +98,11 @@ def fetch_modules_for_test():
 
 # Measure the time taken for fetching all tests for a random module
 time_for_fetching_tests = timeit.timeit(fetch_tests_for_module, number=1000)
-print(f"Time taken for fetching all tests for a module over 100 iterations: {time_for_fetching_tests} seconds")
+print(f"Time taken for fetching all tests for a module over 100 iterations: {time_for_fetching_tests/1000} seconds")
 
 # Measure the time taken for fetching all modules for a random test
 time_for_fetching_modules = timeit.timeit(fetch_modules_for_test, number=1000)
-print(f"Time taken for fetching all modules for a test over 100 iterations: {time_for_fetching_modules} seconds")
+print(f"Time taken for fetching all modules for a test over 100 iterations: {time_for_fetching_modules/1000} seconds")
 
 # print 10 random entries to show that the database is populated
 # print("Modules:")
