@@ -12,13 +12,21 @@ from flask.json.provider import JSONProvider
 
 
 class CustomJSONEncoder(JSONEncoder):
+    """
+    A custom JSON encoder that converts MongoDB ObjectIds to strings.
+
+    This encoder is used to ensure that MongoDB ObjectIds are properly serialized
+    when returning JSON responses from a Flask REST API.
+    """
     def default(self, obj):
         if isinstance(obj, ObjectId):
             return str(obj)
         return super().default(self, obj)
 
 class CustomJSONProvider(JSONProvider):
-    
+    """
+    A custom JSON provider that uses a custom JSON encoder to serialize objects.
+    """
     def dumps(self, obj, **kwargs):
         return json.dumps(obj, **kwargs, cls=CustomJSONEncoder)
     
