@@ -9,12 +9,14 @@ import os
 import json
 from dotenv import load_dotenv
 
+
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, ObjectId):
             return str(obj)
-        return super().default(obj)
-    
+        return super().default(self, obj)
+
+
 app = Flask(__name__)
 api = Api(app)
 app.json_encoder = CustomJSONEncoder
@@ -33,9 +35,10 @@ load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 db_name = os.environ.get("MONGO_DB_NAME")
+host_name = os.environ.get("MONGO_HOST_NAME")
 
 print(f"username: {username}, password: {password}")
-client = MongoClient(f"mongodb://{username}:{password}@localhost:27017")
+client = MongoClient(f"mongodb://{username}:{password}@{host_name}:27017")
 db = client[db_name]
 # we already have a database called "test" from the previous example
 # db = client['test']
@@ -292,6 +295,7 @@ api.add_resource(
     "/current_cabling_map/<string:ID>",
 )
 
+
 class TestsResource(Resource):
     def get(self, testID=None):
         if testID:
@@ -335,7 +339,8 @@ class TestsResource(Resource):
         else:
             return {"message": "Entry not found"}, 404
 
+
 api.add_resource(TestsResource, "/tests", "/tests/<string:testID>")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
