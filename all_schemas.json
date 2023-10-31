@@ -34,10 +34,7 @@
             "position": {
                 "type": "string"
             },
-            "logbook": {
-                "type": "object"
-            },
-            "local_logbook": {
+            "notes": {
                 "type": "object"
             },
             "ref_to_global_logbook": {
@@ -48,6 +45,9 @@
             },
             "overall_grade": {
                 "type": "string"
+            },
+            "tests": {
+                "type": "array"
             }
         },
         "required": [
