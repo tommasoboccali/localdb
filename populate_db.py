@@ -97,11 +97,11 @@ def fetch_modules_for_test():
     modules_in_test = modules_collection.find({"_id": {"$in": test_data.get("modules_list", [])}}).count()
 
 # Measure the time taken for fetching all tests for a random module
-time_for_fetching_tests = timeit.timeit(fetch_tests_for_module, number=100)
+time_for_fetching_tests = timeit.timeit(fetch_tests_for_module, number=1000)
 print(f"Time taken for fetching all tests for a module over 100 iterations: {time_for_fetching_tests} seconds")
 
 # Measure the time taken for fetching all modules for a random test
-time_for_fetching_modules = timeit.timeit(fetch_modules_for_test, number=100)
+time_for_fetching_modules = timeit.timeit(fetch_modules_for_test, number=1000)
 print(f"Time taken for fetching all modules for a test over 100 iterations: {time_for_fetching_modules} seconds")
 
 # print 10 random entries to show that the database is populated
