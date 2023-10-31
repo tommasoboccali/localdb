@@ -58,7 +58,7 @@ for i in range(2000):  # Creating 100 random modules
         "ref_to_global_logbook": [],
         "status": random.choice(["operational", "maintenance", "decommissioned"]),
         "overall_grade": random.choice(["A", "B", "C"]),
-        "underwent_tests": []
+        "tests": []
     }
     inserted_module = modules_collection.insert_one(module)
     module_ids.append(inserted_module.inserted_id)
@@ -83,13 +83,13 @@ for i in range(10000):  # Creating 50 random tests
     for module_id in involved_modules:
         modules_collection.update_one(
             {"_id": ObjectId(module_id)},
-            {"$push": {"underwent_tests": inserted_test.inserted_id}}
+            {"$push": {"tests": inserted_test.inserted_id}}
         )
 
 def fetch_tests_for_module():
     module_id_to_query = random.choice(module_ids)
     module_data = modules_collection.find_one({"_id": module_id_to_query})
-    tests_module_underwent = tests_collection.find({"_id": {"$in": module_data.get("underwent_tests", [])}}).count()
+    tests_module_underwent = tests_collection.find({"_id": {"$in": module_data.get("tests", [])}}).count()
 
 def fetch_modules_for_test():
     test_id_to_query = random.choice(test_ids)
