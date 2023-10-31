@@ -1,15 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
+from flask.json import JSONEncoder
 from pymongo import MongoClient
-from bson import json_util
+from bson import json_util, ObjectId
 from jsonschema import validate, ValidationError
 import pymongo
 import os
 import json
 from dotenv import load_dotenv
 
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
+    
 app = Flask(__name__)
 api = Api(app)
+app.json_encoder = CustomJSONEncoder
 
 # Load the schema
 with open("all_schemas.json", "r") as f:
@@ -59,15 +67,15 @@ class ModulesResource(Resource):
         if moduleID:
             module = modules_collection.find_one({"moduleID": moduleID})
             if module:
-                module["_id"] = str(module["_id"])  # convert ObjectId to string
+                # module["_id"] = str(module["_id"])  # convert ObjectId to string
                 return jsonify(module)
                 # return json.dumps(module, default=json_util.default)
             else:
                 return {"message": "Module not found"}, 404
         else:
             modules = list(modules_collection.find())
-            for module in modules:
-                module["_id"] = str(module["_id"])
+            # for module in modules:
+            #     module["_id"] = str(module["_id"])
             return jsonify(modules)
 
     def post(self):
