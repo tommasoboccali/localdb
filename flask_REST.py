@@ -8,6 +8,7 @@ import pymongo
 import os
 import json
 from dotenv import load_dotenv
+from flask.json.provider import JSONProvider
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -16,11 +17,17 @@ class CustomJSONEncoder(JSONEncoder):
             return str(obj)
         return super().default(self, obj)
 
-
+class CustomJSONProvider(JSONProvider):
+    
+    def dumps(self, obj, **kwargs):
+        return json.dumps(obj, **kwargs, cls=CustomJSONEncoder)
+    
+    def loads(self, s: str | bytes, **kwargs):
+        return json.loads(s, **kwargs)
+    
 app = Flask(__name__)
 api = Api(app)
-app.json_encoder = CustomJSONEncoder
-
+app.json = CustomJSONProvider(app)
 # Load the schema
 with open("all_schemas.json", "r") as f:
     all_schemas = json.load(f)
