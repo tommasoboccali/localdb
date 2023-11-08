@@ -359,7 +359,7 @@ api.add_resource(TestsResource, "/tests", "/tests/<string:testID>")
 
 ### CUSTOM ROUTES ###
 
-@app.route('/newTest', methods=['POST'])
+@app.route('/addTest', methods=['POST'])
 def addTest():
     """1) create a new test from the json given by the request
         2) for every module in the modules_list field of the test object, update that module in the module collection and add the testID of the current test into the tests property of the modules (which is a list of moudule ids)
