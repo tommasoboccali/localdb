@@ -170,7 +170,7 @@ class TestAPI(TestCase):
             return {"message": str(e)}, 400
         """
 
-    def test_newTest(self):
+    def test_addTest(self):
         new_test = {
             "testID": "T001",
             "modules_list": ["M1", "M2"],
@@ -199,7 +199,7 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, {"message": "Module inserted"})
 
-        response = self.client.post("/newTest", json=new_test)
+        response = self.client.post("/addTest", json=new_test)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.get_json(), {"message": "Entry inserted"})
 
