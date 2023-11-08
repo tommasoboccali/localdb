@@ -325,6 +325,22 @@ class TestsResource(Resource):
             for entry in entries:
                 entry["_id"] = str(entry["_id"])
             return jsonify(entries)
+        
+    def newTest(self):
+        """1) create a new test from the json given by the request
+            2) for every module in the modules_list field of the test object, update that module in the module collection and add the testID of the current test into the tests property of the modules (which is a list of moudule ids)
+        """ 
+        try:
+            new_entry = request.get_json()
+            validate(instance=new_entry, schema=tests_schema)
+            tests_collection.insert_one(new_entry)
+        
+            for moduleID in new_entry["modules_list"]:
+                modules_collection.update_one({"moduleID": moduleID}, {"$push": {"tests": new_entry["testID"]}})
+            return {"message": "Entry inserted"}, 201
+        
+        except ValidationError as e:
+            return {"message": str(e)}, 400
 
     def post(self):
         try:
