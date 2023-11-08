@@ -170,44 +170,44 @@ class TestAPI(TestCase):
             return {"message": str(e)}, 400
         """
 
-        def test_newTest(self):
-            new_test = {
-                "testID": "T001",
-                "modules_list": ["M1", "M2"],
-                "testType": "Type1",
-                "testDate": "2023-11-01",
-                "testStatus": "completed",
-                "testResults": {}
-            }
-            # create modules 
-            new_module = {
-                "moduleID": "M1",
-                "position": "cleanroom",
-                "status": "readyformount",
-                # ... (other properties)
-            }
-            response = self.client.post("/modules", json=new_module)
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json, {"message": "Module inserted"})
-            new_module = {
-                "moduleID": "M2",
-                "position": "cleanroom",
-                "status": "readyformount",
-                # ... (other properties)
-            }
-            response = self.client.post("/modules", json=new_module)
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json, {"message": "Module inserted"})
+    def test_newTest(self):
+        new_test = {
+            "testID": "T001",
+            "modules_list": ["M1", "M2"],
+            "testType": "Type1",
+            "testDate": "2023-11-01",
+            "testStatus": "completed",
+            "testResults": {}
+        }
+        # create modules 
+        new_module = {
+            "moduleID": "M1",
+            "position": "cleanroom",
+            "status": "readyformount",
+            # ... (other properties)
+        }
+        response = self.client.post("/modules", json=new_module)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {"message": "Module inserted"})
+        new_module = {
+            "moduleID": "M2",
+            "position": "cleanroom",
+            "status": "readyformount",
+            # ... (other properties)
+        }
+        response = self.client.post("/modules", json=new_module)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {"message": "Module inserted"})
 
-            response = self.client.newTest("/tests", json=new_test)
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.get_json(), {"message": "Entry inserted"})
+        response = self.client.newTest("/tests", json=new_test)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.get_json(), {"message": "Entry inserted"})
 
-            # check if the test was inserted in the modules
-            response = self.client.get("/modules/M1")
-            retrieved_module = response.get_json()
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(retrieved_module['tests'], ["T001"])
+        # check if the test was inserted in the modules
+        response = self.client.get("/modules/M1")
+        retrieved_module = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(retrieved_module['tests'], ["T001"])
 
 if __name__ == "__main__":
     unittest.main()
