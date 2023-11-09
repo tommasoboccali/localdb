@@ -18,21 +18,25 @@ class CustomJSONEncoder(JSONEncoder):
     This encoder is used to ensure that MongoDB ObjectIds are properly serialized
     when returning JSON responses from a Flask REST API.
     """
+
     def default(self, obj):
         if isinstance(obj, ObjectId):
             return str(obj)
         return super().default(self, obj)
 
+
 class CustomJSONProvider(JSONProvider):
     """
     A custom JSON provider that uses a custom JSON encoder to serialize objects.
     """
+
     def dumps(self, obj, **kwargs):
         return json.dumps(obj, **kwargs, cls=CustomJSONEncoder)
-    
+
     def loads(self, s, **kwargs):
         return json.loads(s, **kwargs)
-    
+
+
 app = Flask(__name__)
 api = Api(app)
 app.json = CustomJSONProvider(app)
@@ -45,6 +49,7 @@ logbook_schema = all_schemas["logbook"]
 current_cabling_map_schema = all_schemas["CurrentCablingMap"]
 connection_snapshot_schema = all_schemas["ConnectionSnapshot"]
 tests_schema = all_schemas["tests"]
+cables_schema = all_schemas["cables"]
 
 load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
@@ -63,6 +68,7 @@ logbook_collection = db["logbook"]
 current_cabling_map_collection = db["current_cabling_map"]
 connection_snapshot_collection = db["connection_snapshot"]
 tests_collection = db["tests"]
+cables_collection = db["cables"]
 
 
 class ModulesResource(Resource):
@@ -258,60 +264,70 @@ class LogbookResource(Resource):
 api.add_resource(LogbookResource, "/logbook", "/logbook/<string:timestamp>")
 
 
-class CurrentCablingMapResource(Resource):
-    def get(self, ID=None):
-        if ID:
-            entry = current_cabling_map_collection.find_one({"ID": ID})
-            if entry:
-                entry["_id"] = str(entry["_id"])  # convert ObjectId to string
-                return jsonify(entry)
-            else:
-                return {"message": "Entry not found"}, 404
-        else:
-            entries = list(current_cabling_map_collection.find())
-            for entry in entries:
-                entry["_id"] = str(entry["_id"])
-            return jsonify(entries)
+# class CurrentCablingMapResource(Resource):
+#     def get(self, ID=None):
+#         if ID:
+#             entry = current_cabling_map_collection.find_one({"ID": ID})
+#             if entry:
+#                 entry["_id"] = str(entry["_id"])  # convert ObjectId to string
+#                 return jsonify(entry)
+#             else:
+#                 return {"message": "Entry not found"}, 404
+#         else:
+#             entries = list(current_cabling_map_collection.find())
+#             for entry in entries:
+#                 entry["_id"] = str(entry["_id"])
+#             return jsonify(entries)
 
-    def post(self):
-        try:
-            new_entry = request.get_json()
-            validate(instance=new_entry, schema=current_cabling_map_schema)
-            current_cabling_map_collection.insert_one(new_entry)
-            return {"message": "Entry inserted"}, 201
-        except ValidationError as e:
-            return {"message": str(e)}, 400
+#     def post(self):
+#         try:
+#             new_entry = request.get_json()
+#             validate(instance=new_entry, schema=current_cabling_map_schema)
+#             current_cabling_map_collection.insert_one(new_entry)
+#             return {"message": "Entry inserted"}, 201
+#         except ValidationError as e:
+#             return {"message": str(e)}, 400
 
-    def put(self, ID):
-        if ID:
-            updated_data = request.get_json()
-            current_cabling_map_collection.update_one(
-                {"ID": ID}, {"$set": updated_data}
-            )
-            return {"message": "Entry updated"}, 200
-        else:
-            return {"message": "Entry not found"}, 404
+#     def put(self, ID):
+#         if ID:
+#             updated_data = request.get_json()
+#             current_cabling_map_collection.update_one(
+#                 {"ID": ID}, {"$set": updated_data}
+#             )
+#             return {"message": "Entry updated"}, 200
+#         else:
+#             return {"message": "Entry not found"}, 404
 
-    def delete(self, ID):
-        if ID:
-            entry = current_cabling_map_collection.find_one({"ID": ID})
-            if entry:
-                current_cabling_map_collection.delete_one({"ID": ID})
-                return {"message": "Entry deleted"}, 200
-            else:
-                return {"message": "Entry not found"}, 404
-        else:
-            return {"message": "Entry not found"}, 404
+#     def delete(self, ID):
+#         if ID:
+#             entry = current_cabling_map_collection.find_one({"ID": ID})
+#             if entry:
+#                 current_cabling_map_collection.delete_one({"ID": ID})
+#                 return {"message": "Entry deleted"}, 200
+#             else:
+#                 return {"message": "Entry not found"}, 404
+#         else:
+#             return {"message": "Entry not found"}, 404
 
 
-api.add_resource(
-    CurrentCablingMapResource,
-    "/current_cabling_map",
-    "/current_cabling_map/<string:ID>",
-)
+# api.add_resource(
+#     CurrentCablingMapResource,
+#     "/current_cabling_map",
+#     "/current_cabling_map/<string:ID>",
+# )
 
 
 class TestsResource(Resource):
+    """
+    Resource for handling HTTP requests related to tests.
+
+    Methods:
+    - get: retrieves a test entry by ID or all test entries if no ID is provided
+    - post: creates a new test entry
+    - put: updates an existing test entry by ID
+    - delete: deletes an existing test entry by ID
+    """
+
     def get(self, testID=None):
         if testID:
             entry = tests_collection.find_one({"testID": testID})
@@ -357,24 +373,108 @@ class TestsResource(Resource):
 
 api.add_resource(TestsResource, "/tests", "/tests/<string:testID>")
 
+
+class CablesResource(Resource):
+    """
+    Represents the RESTful API for interacting with the cables collection in the database.
+
+    Methods:
+    - get(cableID): retrieves a single cable entry by ID or all cable entries if no ID is provided.
+    - post(): creates a new cable entry in the database.
+    - put(cableID): updates an existing cable entry in the database by ID.
+    - delete(cableID): deletes an existing cable entry from the database by ID.
+    """
+
+    def get(self, cableID):
+        if cableID:
+            entry = cables_collection.find_one({"cableID": cableID})
+            if entry:
+                entry["_id"] = str(entry["_id"])  # convert ObjectId to string
+                return jsonify(entry)
+            else:
+                return {"message": "Entry not found"}, 404
+        else:
+            entries = list(cables_collection.find())
+            for entry in entries:
+                entry["_id"] = str(entry["_id"])
+            return jsonify(entries)
+
+    def post(self):
+        try:
+            new_entry = request.get_json()
+            validate(instance=new_entry, schema=cables_schema)
+            cables_collection.insert_one(new_entry)
+            return {"message": "Entry inserted"}, 201
+        except ValidationError as e:
+            return {"message": str(e)}, 400
+
+    def put(self, cableID):
+        if cableID:
+            updated_data = request.get_json()
+            cables_collection.update_one({"cableID": cableID}, {"$set": updated_data})
+            return {"message": "Entry updated"}, 200
+        else:
+            return {"message": "Entry not found"}, 404
+
+    def delete(self, cableID):
+        if cableID:
+            entry = cables_collection.find_one({"cableID": cableID})
+            if entry:
+                cables_collection.delete_one({"cableID": cableID})
+                return {"message": "Entry deleted"}, 200
+            else:
+                return {"message": "Entry not found"}, 404
+        else:
+            return {"message": "Entry not found"}, 404
+
+
+api.add_resource(CablesResource, "/cables", "/cables/<string:cableID>")
+
 ### CUSTOM ROUTES ###
 
-@app.route('/addTest', methods=['POST'])
+
+@app.route("/addTest", methods=["POST"])
 def addTest():
     """1) create a new test from the json given by the request
-        2) for every module in the modules_list field of the test object, update that module in the module collection and add the testID of the current test into the tests property of the modules (which is a list of moudule ids)
-    """ 
+    2) for every module in the modules_list field of the test object, update that module in the module collection and add the testID of the current test into the tests property of the modules (which is a list of moudule ids)
+    """
     try:
         new_entry = request.get_json()
         validate(instance=new_entry, schema=tests_schema)
         tests_collection.insert_one(new_entry)
-    
+
         for moduleID in new_entry["modules_list"]:
-            modules_collection.update_one({"moduleID": moduleID}, {"$push": {"tests": new_entry["testID"]}})
+            modules_collection.update_one(
+                {"moduleID": moduleID}, {"$push": {"tests": new_entry["testID"]}}
+            )
         return {"message": "Entry inserted"}, 201
-    
+
     except ValidationError as e:
         return {"message": str(e)}, 400
 
+
+@app.route("/cablingMap", methods=["POST"])
+def cablingMap():
+    data = request.get_json()
+    detSide = data.get("detSide", [])
+    crateSide = data.get("crateSide", [])
+    cabling_map = {}
+
+    for side in detSide:
+        cabling_map[side] = []
+        cables = cables_collection.find({"detSide": side})
+        for cable in cables:
+            cabling_map[side].append(cable)
+
+    for side in crateSide:
+        if side not in cabling_map:
+            cabling_map[side] = []
+        cables = cables_collection.find({"crateSide": side})
+        for cable in cables:
+            cabling_map[side].append(cable)
+
+    return jsonify(cabling_map)
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5005, debug=True)

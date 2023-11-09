@@ -56,6 +56,18 @@
             "status"
         ]
     },
+    "Cables": {
+        "type": "object",
+        "cableID": {
+            "type": "string"
+        },
+        "detSide": {
+            "type": "string"
+        },
+        "crateSide": {
+            "type": "string"
+        }
+    },
     "CurrentCablingMap": {
         "type": "object",
         "properties": {
@@ -69,7 +81,7 @@
                 }
             },
             "crateSide": {
-                "type": "string"
+                "type": "array"
             },
             "Type": {
                 "type": "string"
