@@ -210,6 +210,7 @@ class TestAPI(TestCase):
         self.assertEqual(retrieved_module['tests'], ["T001"])
 
     def test_cablingMap(self):
+        print("test_cablingMap")
         cables_to_add = ([
             {'cableID': 'cable1', 'detSide': 'det1', 'crateSide': 'cable2'},
             {'cableID': 'cable2', 'detSide': 'cable1', 'crateSide': 'crate1'},
@@ -220,7 +221,7 @@ class TestAPI(TestCase):
             response = self.client.post('/cables', json=cable)
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json(), {"message": "Entry inserted"})
-
+        print("cables added")
         response = self.client.post('/cablingMap', json={
             'detSide': ["cable1"],
             'crateSide': ["cable3"]
