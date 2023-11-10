@@ -460,18 +460,40 @@ def cablingMap():
     crateSide = data.get("crateSide", [])
     cabling_map = {}
 
-    for side in detSide:
-        cabling_map[side] = []
-        cables = cables_collection.find({"detSide": side})
-        for cable in cables:
-            cabling_map[side].append(cable)
+    for cable in detSide:
+        cableID = cable["cableID"]
+        cabling_map[cableID] = []
+        cabling_map[cableID].append(["detSide"])
+        # now check crate side of the cable, get next cable and continue until you reach the end of the chain
+        nextCable = cables_collection.find_one({"crateSide": cableID})
+        while nextCable:
+            cabling_map[cableID].append(nextCable["cableID"])
+            nextCable = cables_collection.find_one(
+                {"crateSide": nextCable["cableID"]}
+            )
+        cabling_map[cableID].append(["crateSide"])
 
-    for side in crateSide:
-        if side not in cabling_map:
-            cabling_map[side] = []
-        cables = cables_collection.find({"crateSide": side})
-        for cable in cables:
-            cabling_map[side].append(cable)
+    for cable in crateSide:
+        cableID = cable["cableID"]
+        cabling_map[cableID] = []
+        cabling_map[cableID].append(["crateSide"])
+        # now check crate side of the cable, get next cable and continue until you reach the end of the chain
+        nextCable = cables_collection.find_one({"detSide": cableID})
+        while nextCable:
+            cabling_map[cableID].append(nextCable["cableID"])
+            nextCable = cables_collection.find_one({"detSide": nextCable["cableID"]})
+        cabling_map[cableID].append(["detSide"])
+
+    return jsonify(cabling_map)
+
+   #         cabling_map[side].append(cable)
+
+    # for side in crateSide:
+    #     if side not in cabling_map:
+    #         cabling_map[side] = []
+    #     cables = cables_collection.find({"crateSide": side})
+    #     for cable in cables:
+    #         cabling_map[side].append(cable)
 
     return jsonify(cabling_map)
 

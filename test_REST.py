@@ -209,5 +209,22 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(retrieved_module['tests'], ["T001"])
 
+    def test_cablingMap(self):
+        self.cables_collection.insert_many([
+            {'cableID': 'cable1', 'detSide': 'det1', 'crateSide': 'cable2'},
+            {'cableID': 'cable2', 'detSide': 'cable1', 'crateSide': 'crate1'},
+            {'cableID': 'cable3', 'detSide': 'cable4', 'crateSide': 'crate2'},
+            {'cableID': 'cable3', 'detSide': 'det2', 'crateSide': 'cable3'},
+        ])
+        response = self.client.post('/cablingMap', json={
+            'detSide': ["cable1"],
+            'crateSide': ["cable3"]
+        })
+        json_data = response.get_json()
+        benchmark = ["detSide", "cable1", "cable2", "crateSide"]
+        self.assertEqual(json_data["cable1"], benchmark)
+
+
+
 if __name__ == "__main__":
     unittest.main()
