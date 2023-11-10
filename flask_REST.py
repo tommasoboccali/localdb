@@ -471,6 +471,7 @@ def cablingMap():
             nextCable = cables_collection.find_one(
                 {"detSide": nextCable["cableID"]}
             )
+            print(nextCable)
         cabling_map[cableID].append(["crateSide"])
 
     for cable in crateSide:
