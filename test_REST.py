@@ -226,6 +226,7 @@ class TestAPI(TestCase):
             'crateSide': ["cable3"]
         })
         json_data = response.get_json()
+        print(json_data)
         benchmark = ["detSide", "cable1", "cable2", "crateSide"]
         self.assertEqual(json_data["cable1"], benchmark)
 
