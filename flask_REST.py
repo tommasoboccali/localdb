@@ -465,11 +465,11 @@ def cablingMap():
         cabling_map[cableID] = []
         cabling_map[cableID].append(["detSide"])
         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-        nextCable = cables_collection.find_one({"crateSide": cableID})
+        nextCable = cables_collection.find_one({"detSide": cableID})
         while nextCable:
             cabling_map[cableID].append(nextCable["cableID"])
             nextCable = cables_collection.find_one(
-                {"crateSide": nextCable["cableID"]}
+                {"detSide": nextCable["cableID"]}
             )
         cabling_map[cableID].append(["crateSide"])
 
@@ -478,11 +478,11 @@ def cablingMap():
         cabling_map[cableID] = []
         cabling_map[cableID].append(["crateSide"])
         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-        nextCable = cables_collection.find_one({"detSide": cableID})
+        nextCable = cables_collection.find_one({"crateSide": cableID})
         while nextCable:
             cabling_map[cableID].append(nextCable["cableID"])
-            nextCable = cables_collection.find_one({"detSide": nextCable["cableID"]})
-        cabling_map[cableID].append(["detSide"])
+            nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
+        cabling_map[cableID].append(["crateSide"])
 
     return jsonify(cabling_map)
 
