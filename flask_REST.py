@@ -464,6 +464,7 @@ def cablingMap():
         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
         cabling_map[cableID] = []
         cabling_map[cableID].append(["detSide"])
+        cabling_map[cableID].append(cableID)
         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
         nextCable = cables_collection.find_one({"detSide": cableID})
         print(nextCable)
