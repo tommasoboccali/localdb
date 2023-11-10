@@ -56,7 +56,7 @@
             "status"
         ]
     },
-    "Cables": {
+    "cables": {
         "type": "object",
         "cableID": {
             "type": "string"
