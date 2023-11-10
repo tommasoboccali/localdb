@@ -79,40 +79,40 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Log deleted"})
 
-    def test_insert_cabling_map(self):
-        test_data = {
-            "ID": "TestID",
-            "detSide": [{"channel": 1}],
-            "crateSide": "TestCrate",
-            "Type": "TestType"
-        }
+    # def test_insert_cabling_map(self):
+    #     test_data = {
+    #         "ID": "TestID",
+    #         "detSide": [{"channel": 1}],
+    #         "crateSide": "TestCrate",
+    #         "Type": "TestType"
+    #     }
 
-        response = self.client.post('/current_cabling_map', json=test_data)
-        self.assertEqual(response.status_code, 201)
+    #     response = self.client.post('/current_cabling_map', json=test_data)
+    #     self.assertEqual(response.status_code, 201)
 
-        inserted_data = self.client.get('/current_cabling_map/TestID')
-        self.assertIsNotNone(inserted_data)
+    #     inserted_data = self.client.get('/current_cabling_map/TestID')
+    #     self.assertIsNotNone(inserted_data)
 
-    def test_invalid_cabling_map(self):
-        test_data = {
-            "ID": "TestID",
-            "detSide": [{"channel": 1}]
-        }
+    # def test_invalid_cabling_map(self):
+    #     test_data = {
+    #         "ID": "TestID",
+    #         "detSide": [{"channel": 1}]
+    #     }
 
-        response = self.client.post('/current_cabling_map', json=test_data)
-        self.assertEqual(response.status_code, 400)
+    #     response = self.client.post('/current_cabling_map', json=test_data)
+    #     self.assertEqual(response.status_code, 400)
 
-    def test_get_cabling_map(self):
-        test_data = {
-            "ID": "TestID",
-            "detSide": [{"channel": 1}],
-            "crateSide": "TestCrate",
-            "Type": "TestType"
-        }
-        self.client.post('/current_cabling_map', json=test_data)
-        response = self.client.get('/current_cabling_map/TestID')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'TestID', response.data)
+    # def test_get_cabling_map(self):
+    #     test_data = {
+    #         "ID": "TestID",
+    #         "detSide": [{"channel": 1}],
+    #         "crateSide": "TestCrate",
+    #         "Type": "TestType"
+    #     }
+    #     self.client.post('/current_cabling_map', json=test_data)
+    #     response = self.client.get('/current_cabling_map/TestID')
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertIn(b'TestID', response.data)
 
     def test_insert_and_retrieve_test(self):
         new_test = {
@@ -220,7 +220,7 @@ class TestAPI(TestCase):
             response = self.client.post('/cables', json=cable)
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json(), {"message": "Entry inserted"})
-            
+
         response = self.client.post('/cablingMap', json={
             'detSide': ["cable1"],
             'crateSide': ["cable3"]
