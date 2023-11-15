@@ -264,59 +264,6 @@ class LogbookResource(Resource):
 api.add_resource(LogbookResource, "/logbook", "/logbook/<string:timestamp>")
 
 
-# class CurrentCablingMapResource(Resource):
-#     def get(self, ID=None):
-#         if ID:
-#             entry = current_cabling_map_collection.find_one({"ID": ID})
-#             if entry:
-#                 entry["_id"] = str(entry["_id"])  # convert ObjectId to string
-#                 return jsonify(entry)
-#             else:
-#                 return {"message": "Entry not found"}, 404
-#         else:
-#             entries = list(current_cabling_map_collection.find())
-#             for entry in entries:
-#                 entry["_id"] = str(entry["_id"])
-#             return jsonify(entries)
-
-#     def post(self):
-#         try:
-#             new_entry = request.get_json()
-#             validate(instance=new_entry, schema=current_cabling_map_schema)
-#             current_cabling_map_collection.insert_one(new_entry)
-#             return {"message": "Entry inserted"}, 201
-#         except ValidationError as e:
-#             return {"message": str(e)}, 400
-
-#     def put(self, ID):
-#         if ID:
-#             updated_data = request.get_json()
-#             current_cabling_map_collection.update_one(
-#                 {"ID": ID}, {"$set": updated_data}
-#             )
-#             return {"message": "Entry updated"}, 200
-#         else:
-#             return {"message": "Entry not found"}, 404
-
-#     def delete(self, ID):
-#         if ID:
-#             entry = current_cabling_map_collection.find_one({"ID": ID})
-#             if entry:
-#                 current_cabling_map_collection.delete_one({"ID": ID})
-#                 return {"message": "Entry deleted"}, 200
-#             else:
-#                 return {"message": "Entry not found"}, 404
-#         else:
-#             return {"message": "Entry not found"}, 404
-
-
-# api.add_resource(
-#     CurrentCablingMapResource,
-#     "/current_cabling_map",
-#     "/current_cabling_map/<string:ID>",
-# )
-
-
 class TestsResource(Resource):
     """
     Resource for handling HTTP requests related to tests.
@@ -453,60 +400,78 @@ def addTest():
         return {"message": str(e)}, 400
 
 
+# @app.route("/cablingMap", methods=["POST"])
+# def cablingMap():
+#     data = request.get_json()
+#     detSide = data.get("detSide", [])
+#     crateSide = data.get("crateSide", [])
+#     cabling_map = {}
+
+#     for cable in detSide:
+#         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
+#         cabling_map[cableID] = []
+#         cabling_map[cableID].append("detSide")
+#         cabling_map[cableID].append(cableID)
+#         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
+#         nextCable = cables_collection.find_one({"detSide": cableID})
+#         print(nextCable)
+#         while nextCable != None:
+#             cabling_map[cableID].append(nextCable["cableID"])
+#             nextCable = cables_collection.find_one(
+#                 {"detSide": nextCable["cableID"]}
+#             )
+#             print(nextCable)
+
+#         cabling_map[cableID].append("crateSide")
+#         print('Out of while loop')
+
+#     for cable in crateSide:
+#         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
+#         cabling_map[cableID] = []
+#         cabling_map[cableID].append("crateSide")
+#         cabling_map[cableID].append(cableID)
+#         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
+#         nextCable = cables_collection.find_one({"crateSide": cableID})
+#         print(nextCable)
+#         while nextCable != None:
+#             cabling_map[cableID].append(nextCable["cableID"])
+#             nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
+#             # print(nextCable)
+#         cabling_map[cableID].append("detSide")
+
+#         print('Out of while loop2')
+
+#     return jsonify(cabling_map)
 @app.route("/cablingMap", methods=["POST"])
-def cablingMap():
-    data = request.get_json()
-    detSide = data.get("detSide", [])
-    crateSide = data.get("crateSide", [])
-    cabling_map = {}
+def cabling_map():
+    request_data = request.get_json()
+    detector_side_cables = request_data.get("detSide", [])
+    crate_side_cables = request_data.get("crateSide", [])
+    map_of_cabling = {}
 
-    for cable in detSide:
-        cableID = cables_collection.find_one({"cableID": cable})["cableID"]
-        cabling_map[cableID] = []
-        cabling_map[cableID].append("detSide")
-        cabling_map[cableID].append(cableID)
-        # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-        nextCable = cables_collection.find_one({"detSide": cableID})
-        print(nextCable)
-        while nextCable != None:
-            cabling_map[cableID].append(nextCable["cableID"])
-            nextCable = cables_collection.find_one(
-                {"detSide": nextCable["cableID"]}
-            )
-            print(nextCable)
+    for cable_id in detector_side_cables:
+        current_cable_id = cables_collection.find_one({"cableID": cable_id})["cableID"]
+        map_of_cabling[current_cable_id] = ["detSide", current_cable_id]
+        next_cable_in_chain = cables_collection.find_one({"detSide": current_cable_id})
 
-        cabling_map[cableID].append("crateSide")
-        print('Out of while loop')
+        while next_cable_in_chain is not None:
+            map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
+            next_cable_in_chain = cables_collection.find_one({"detSide": next_cable_in_chain["cableID"]})
 
-    for cable in crateSide:
-        cableID = cables_collection.find_one({"cableID": cable})["cableID"]
-        cabling_map[cableID] = []
-        cabling_map[cableID].append("crateSide")
-        cabling_map[cableID].append(cableID)
-        # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-        nextCable = cables_collection.find_one({"crateSide": cableID})
-        print(nextCable)
-        while nextCable != None:
-            cabling_map[cableID].append(nextCable["cableID"])
-            nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
-            # print(nextCable)
-        cabling_map[cableID].append("detSide")
+        map_of_cabling[current_cable_id].append("crateSide")
 
-        print('Out of while loop2')
+    for cable_id in crate_side_cables:
+        current_cable_id = cables_collection.find_one({"cableID": cable_id})["cableID"]
+        map_of_cabling[current_cable_id] = ["crateSide", current_cable_id]
+        next_cable_in_chain = cables_collection.find_one({"crateSide": current_cable_id})
 
-    return jsonify(cabling_map)
+        while next_cable_in_chain is not None:
+            map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
+            next_cable_in_chain = cables_collection.find_one({"crateSide": next_cable_in_chain["cableID"]})
 
-   #         cabling_map[side].append(cable)
+        map_of_cabling[current_cable_id].append("detSide")
 
-    # for side in crateSide:
-    #     if side not in cabling_map:
-    #         cabling_map[side] = []
-    #     cables = cables_collection.find({"crateSide": side})
-    #     for cable in cables:
-    #         cabling_map[side].append(cable)
-
-    # return jsonify(cabling_map)
-
+    return jsonify(map_of_cabling)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005, debug=True)
