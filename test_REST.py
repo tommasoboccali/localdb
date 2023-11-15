@@ -222,6 +222,9 @@ class TestAPI(TestCase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json(), {"message": "Entry inserted"})
         print("cables added")
+        # print the whole cable collection
+        response = self.client.get('/cables')
+        print(response.get_json())
         response = self.client.post('/cablingMap', json={
             'detSide': ["cable1"],
             'crateSide': ["cable3"]
