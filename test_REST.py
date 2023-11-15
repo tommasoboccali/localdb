@@ -230,12 +230,13 @@ class TestAPI(TestCase):
         response = self.client.get('/cables')
         print(response.get_json())
 
-        response = self.client.post('/cablingMap', json={'detSide': ["cable1"], 'crateSide': ["cable3"]})
+        response = self.client.post('/cablingMap', json={'detSide': ["cable1"], 'crateSide': ["cable3", "cable4"]})
         json_data = response.get_json()
         print(json_data)
         expected_result = ["detSide", "cable1", "cable2", "crateSide"]
         self.assertEqual(json_data["cable1"], expected_result)
         print(json_data['cable3'])
+        print(json_data['cable4'])
 
 
 
