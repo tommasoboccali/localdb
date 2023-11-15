@@ -51,7 +51,7 @@ connection_snapshot_schema = all_schemas["ConnectionSnapshot"]
 tests_schema = all_schemas["tests"]
 cables_schema = all_schemas["cables"]
 
-load_dotenv("mongo.env")
+load_dotenv("mongo_prod.env")
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 db_name = os.environ.get("MONGO_DB_NAME")
@@ -400,48 +400,6 @@ def addTest():
         return {"message": str(e)}, 400
 
 
-# @app.route("/cablingMap", methods=["POST"])
-# def cablingMap():
-#     data = request.get_json()
-#     detSide = data.get("detSide", [])
-#     crateSide = data.get("crateSide", [])
-#     cabling_map = {}
-
-#     for cable in detSide:
-#         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
-#         cabling_map[cableID] = []
-#         cabling_map[cableID].append("detSide")
-#         cabling_map[cableID].append(cableID)
-#         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-#         nextCable = cables_collection.find_one({"detSide": cableID})
-#         print(nextCable)
-#         while nextCable != None:
-#             cabling_map[cableID].append(nextCable["cableID"])
-#             nextCable = cables_collection.find_one(
-#                 {"detSide": nextCable["cableID"]}
-#             )
-#             print(nextCable)
-
-#         cabling_map[cableID].append("crateSide")
-#         print('Out of while loop')
-
-#     for cable in crateSide:
-#         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
-#         cabling_map[cableID] = []
-#         cabling_map[cableID].append("crateSide")
-#         cabling_map[cableID].append(cableID)
-#         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
-#         nextCable = cables_collection.find_one({"crateSide": cableID})
-#         print(nextCable)
-#         while nextCable != None:
-#             cabling_map[cableID].append(nextCable["cableID"])
-#             nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
-#             # print(nextCable)
-#         cabling_map[cableID].append("detSide")
-
-#         print('Out of while loop2')
-
-#     return jsonify(cabling_map)
 @app.route("/cablingMap", methods=["POST"])
 def cabling_map():
     request_data = request.get_json()
@@ -456,22 +414,29 @@ def cabling_map():
 
         while next_cable_in_chain is not None:
             map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
-            next_cable_in_chain = cables_collection.find_one({"detSide": next_cable_in_chain["cableID"]})
+            next_cable_in_chain = cables_collection.find_one(
+                {"detSide": next_cable_in_chain["cableID"]}
+            )
 
         map_of_cabling[current_cable_id].append("crateSide")
 
     for cable_id in crate_side_cables:
         current_cable_id = cables_collection.find_one({"cableID": cable_id})["cableID"]
         map_of_cabling[current_cable_id] = ["crateSide", current_cable_id]
-        next_cable_in_chain = cables_collection.find_one({"crateSide": current_cable_id})
+        next_cable_in_chain = cables_collection.find_one(
+            {"crateSide": current_cable_id}
+        )
 
         while next_cable_in_chain is not None:
             map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
-            next_cable_in_chain = cables_collection.find_one({"crateSide": next_cable_in_chain["cableID"]})
+            next_cable_in_chain = cables_collection.find_one(
+                {"crateSide": next_cable_in_chain["cableID"]}
+            )
 
         map_of_cabling[current_cable_id].append("detSide")
 
     return jsonify(map_of_cabling)
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5005, debug=True)
+    app.run(host="0.0.0.0", port=5005, debug=False)
