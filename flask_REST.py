@@ -485,10 +485,13 @@ def cablingMap():
         cabling_map[cableID].append(cableID)
         # now check crate side of the cable, get next cable and continue until you reach the end of the chain
         nextCable = cables_collection.find_one({"crateSide": cableID})
+        print(nextCable)
         while nextCable != None:
             cabling_map[cableID].append(nextCable["cableID"])
             nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
         cabling_map[cableID].append(["crateSide"])
+
+        print('Out of while loop2')
 
     return jsonify(cabling_map)
 
