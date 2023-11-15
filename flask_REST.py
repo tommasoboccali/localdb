@@ -500,7 +500,7 @@ def cablingMap():
     #     for cable in cables:
     #         cabling_map[side].append(cable)
 
-    return jsonify(cabling_map)
+    # return jsonify(cabling_map)
 
 
 if __name__ == "__main__":
