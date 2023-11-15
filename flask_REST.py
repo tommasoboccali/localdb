@@ -476,6 +476,7 @@ def cablingMap():
             print(nextCable)
 
         cabling_map[cableID].append(["crateSide"])
+        print('Out of while loop')
 
     for cable in crateSide:
         cableID = cables_collection.find_one({"cableID": cable})["cableID"]
