@@ -226,17 +226,16 @@ class TestAPI(TestCase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json(), {"message": "Entry inserted"})
 
-        print("Cables added")
         response = self.client.get('/cables')
-        print(response.get_json())
 
         response = self.client.post('/cablingMap', json={'detSide': ["cable1"], 'crateSide': ["cable3", "cable4"]})
         json_data = response.get_json()
-        print(json_data)
-        expected_result = ["detSide", "cable1", "cable2", "crateSide"]
-        self.assertEqual(json_data["cable1"], expected_result)
-        print(json_data['cable3'])
-        print(json_data['cable4'])
+        expected_result_cable1 = ["detSide", "cable1", "cable2", "crateSide"]
+        expected_result_cable3 = ['crateSide', 'cable3', 'cable4', 'detSide']
+        expected_result_cable4 = ['crateSide', 'cable4', 'detSide']
+        self.assertEqual(json_data["cable1"], expected_result_cable1)
+        self.assertEqual(json_data["cable3"], expected_result_cable3)
+        self.assertEqual(json_data["cable4"], expected_result_cable4)
 
 
 
