@@ -51,7 +51,7 @@ connection_snapshot_schema = all_schemas["ConnectionSnapshot"]
 tests_schema = all_schemas["tests"]
 cables_schema = all_schemas["cables"]
 
-load_dotenv("mongo_prod.env")
+load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 db_name = os.environ.get("MONGO_DB_NAME")
