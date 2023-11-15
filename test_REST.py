@@ -211,30 +211,31 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(retrieved_module['tests'], ["T001"])
 
-    def test_cablingMap(self):
-        print("test_cablingMap")
-        cables_to_add = ([
+
+    def test_cabling_map(self):
+        print("Testing cabling map")
+        cables_to_add = [
             {'cableID': 'cable1', 'detSide': 'det1', 'crateSide': 'cable2'},
             {'cableID': 'cable2', 'detSide': 'cable1', 'crateSide': 'crate1'},
             {'cableID': 'cable3', 'detSide': 'cable4', 'crateSide': 'crate2'},
             {'cableID': 'cable4', 'detSide': 'det2', 'crateSide': 'cable3'},
-        ])
+        ]
+
         for cable in cables_to_add:
             response = self.client.post('/cables', json=cable)
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.get_json(), {"message": "Entry inserted"})
-        print("cables added")
-        # print the whole cable collection
+
+        print("Cables added")
         response = self.client.get('/cables')
         print(response.get_json())
-        response = self.client.post('/cablingMap', json={
-            'detSide': ["cable1"],
-            'crateSide': ["cable3"]
-        })
+
+        response = self.client.post('/cablingMap', json={'detSide': ["cable1"], 'crateSide': ["cable3"]})
         json_data = response.get_json()
         print(json_data)
-        benchmark = ["detSide", "cable1", "cable2", "crateSide"]
-        self.assertEqual(json_data["cable1"], benchmark)
+        expected_result = ["detSide", "cable1", "cable2", "crateSide"]
+        self.assertEqual(json_data["cable1"], expected_result)
+        print(json_data['cable3'])
 
 
 
