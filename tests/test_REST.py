@@ -1,6 +1,6 @@
 import unittest
 from flask_testing import TestCase
-from flask_REST import (
+from app.flask_REST import (
     app,
     db,
 )  # replace 'your_flask_app_file' with the actual name of your Flask app file
