@@ -475,7 +475,7 @@ def cablingMap():
             )
             print(nextCable)
 
-        cabling_map[cableID].append(["crateSide"])
+        cabling_map[cableID].append("crateSide")
         print('Out of while loop')
 
     for cable in crateSide:
@@ -490,7 +490,7 @@ def cablingMap():
             cabling_map[cableID].append(nextCable["cableID"])
             nextCable = cables_collection.find_one({"crateSide": nextCable["cableID"]})
             # print(nextCable)
-        cabling_map[cableID].append(["crateSide"])
+        cabling_map[cableID].append("detSide")
 
         print('Out of while loop2')
 
