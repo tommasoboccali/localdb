@@ -385,7 +385,7 @@ class CablesResource(Resource):
     - delete(cableID): deletes an existing cable entry from the database by ID.
     """
 
-    def get(self, cableID):
+    def get(self, cableID=None):
         if cableID:
             entry = cables_collection.find_one({"cableID": cableID})
             if entry:
