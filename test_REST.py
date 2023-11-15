@@ -215,7 +215,7 @@ class TestAPI(TestCase):
             {'cableID': 'cable1', 'detSide': 'det1', 'crateSide': 'cable2'},
             {'cableID': 'cable2', 'detSide': 'cable1', 'crateSide': 'crate1'},
             {'cableID': 'cable3', 'detSide': 'cable4', 'crateSide': 'crate2'},
-            {'cableID': 'cable3', 'detSide': 'det2', 'crateSide': 'cable3'},
+            {'cableID': 'cable4', 'detSide': 'det2', 'crateSide': 'cable3'},
         ])
         for cable in cables_to_add:
             response = self.client.post('/cables', json=cable)
