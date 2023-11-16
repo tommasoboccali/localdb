@@ -58,16 +58,65 @@
     },
     "cables": {
         "type": "object",
-        "cableID": {
-            "type": "string"
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the cable"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of cable, e.g., '12-to-1'"
+          },
+          "detSide": {
+            "type": "array",
+            "description": "List of connections on the detector side",
+            "items": {
+              "type": "object",
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "connectedTo": {
+                  "bsonType": "objectId",
+                  "description": "Reference to the connected module or cable"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Type of entity this port is connected to, e.g., 'module', 'cable'"
+                },
+                "exitingOn":{
+                    "type": "integer",
+                    "description": "Signal from this input exits on output port"
+                }
+              },
+              "required": ["port", "connectedTo", "type"]
+            }
+          },
+          "crateSide": {
+            "type": "object",
+            "description": "Connection on the crate side",
+            "properties": {
+              "port": {
+                "type": "integer"
+              },
+              "connectedTo": {
+                "bsonType": "objectId",
+                "description": "Reference to the connected crate or cable"
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of entity this port is connected to, e.g., 'crate', 'cable'"
+              },
+              "comingFrom":{
+                  "type": "integer",
+                  "description": "Signal from this output comes from input port"
+              }
+            },
+            "required": ["port", "connectedTo", "type"]
+          }
         },
-        "detSide": {
-            "type": "string"
-        },
-        "crateSide": {
-            "type": "string"
-        }
-    },
+        "required": ["_id", "type", "detSide", "crateSide"]
+      },      
     "CurrentCablingMap": {
         "type": "object",
         "properties": {
