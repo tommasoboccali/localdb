@@ -20,6 +20,7 @@ class TestAPI(TestCase):
         db.current_cabling_map.drop()
         db.tests.drop()
         db.cables.drop()
+        db.cables_templates.drop()
 
     def tearDown(self):
         db.modules.drop()
@@ -27,6 +28,7 @@ class TestAPI(TestCase):
         db.current_cabling_map.drop()
         db.tests.drop()
         db.cables.drop()
+        db.cables_templates.drop()
 
     def test_fetch_all_modules_empty(self):
         response = self.client.get("/modules")
@@ -80,41 +82,6 @@ class TestAPI(TestCase):
         response = self.client.delete("/logbook/2023-11-03T14:21:29Z")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Log deleted"})
-
-    # def test_insert_cabling_map(self):
-    #     test_data = {
-    #         "ID": "TestID",
-    #         "detSide": [{"channel": 1}],
-    #         "crateSide": "TestCrate",
-    #         "Type": "TestType"
-    #     }
-
-    #     response = self.client.post('/current_cabling_map', json=test_data)
-    #     self.assertEqual(response.status_code, 201)
-
-    #     inserted_data = self.client.get('/current_cabling_map/TestID')
-    #     self.assertIsNotNone(inserted_data)
-
-    # def test_invalid_cabling_map(self):
-    #     test_data = {
-    #         "ID": "TestID",
-    #         "detSide": [{"channel": 1}]
-    #     }
-
-    #     response = self.client.post('/current_cabling_map', json=test_data)
-    #     self.assertEqual(response.status_code, 400)
-
-    # def test_get_cabling_map(self):
-    #     test_data = {
-    #         "ID": "TestID",
-    #         "detSide": [{"channel": 1}],
-    #         "crateSide": "TestCrate",
-    #         "Type": "TestType"
-    #     }
-    #     self.client.post('/current_cabling_map', json=test_data)
-    #     response = self.client.get('/current_cabling_map/TestID')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn(b'TestID', response.data)
 
     def test_insert_and_retrieve_test(self):
         new_test = {
@@ -210,6 +177,66 @@ class TestAPI(TestCase):
         retrieved_module = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(retrieved_module['tests'], ["T001"])
+
+    def test_insert_cable_templates(self):
+        cable_templates = [
+            {
+                "type": "exapus",
+                "internalRouting": {
+                    "1": [1, 2],
+                    "2": [3, 4],
+                    "3": [5, 6],
+                    "4": [7, 8],
+                    "5": [9, 10],
+                    "6": [11, 12]
+                }
+            },
+            {
+                "type": "extfib",
+                "internalRouting": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 3,
+                    "4": 4,
+                    "5": 5,
+                    "6": 6,
+                    "7": 7,
+                    "8": 8,
+                    "9": 9,
+                    "10": 10,
+                    "11": 11,
+                    "12": 12
+                }
+            },
+            {
+                "type": "dodecapus",
+                "internalRouting": {
+                    "1": 3,
+                    "2": 6,
+                    "3": 9,
+                    "4": 12,
+                    "5": 2,
+                    "6": 5,
+                    "7": 8,
+                    "8": 11,
+                    "9": 1,
+                    "10": 4,
+                    "11": 7,
+                    "12": 10
+                }
+            }
+        ]
+
+        for template in cable_templates:
+            response = self.client.post("/cable_templates", json=template)
+            self.assertEqual(response.status_code, 201)
+            self.assertIn("message", response.json)
+            self.assertEqual(response.json["message"], "Cable template inserted")
+
+            cable_type = template["type"]
+            response = self.client.get(f"/cable_templates/{cable_type}")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json["type"], cable_type)
 
 
     def test_cabling_map(self):

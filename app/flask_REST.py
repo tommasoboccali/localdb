@@ -50,6 +50,7 @@ current_cabling_map_schema = all_schemas["CurrentCablingMap"]
 connection_snapshot_schema = all_schemas["ConnectionSnapshot"]
 tests_schema = all_schemas["tests"]
 cables_schema = all_schemas["cables"]
+cable_templates_schema = all_schemas["cable_templates"]
 
 load_dotenv("mongo.env")
 username = os.environ.get("MONGO_USERNAME")
@@ -69,6 +70,7 @@ current_cabling_map_collection = db["current_cabling_map"]
 connection_snapshot_collection = db["connection_snapshot"]
 tests_collection = db["tests"]
 cables_collection = db["cables"]
+cable_templates_collection = db["cable_templates"]
 
 
 class ModulesResource(Resource):
@@ -377,11 +379,76 @@ class CablesResource(Resource):
 
 api.add_resource(CablesResource, "/cables", "/cables/<string:cableID>")
 
+# Define the schema for validation
+cable_templates_schema = {
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "description": "Type of cable, e.g., '12-to-1'"
+        },
+        "internalRouting": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer"
+            },
+            "description": "Mapping of input ports to output ports"
+        }
+    },
+    "required": ["type", "internalRouting"]
+}
+
+class CableTemplatesResource(Resource):
+    def get(self, cable_type=None):
+        if cable_type:
+            entry = cable_templates_collection.find_one({"type": cable_type})
+            if entry:
+                entry["_id"] = str(entry["_id"])
+                return jsonify(entry)
+            else:
+                return {"message": "Template not found"}, 404
+        else:
+            entries = list(cable_templates_collection.find())
+            for entry in entries:
+                entry["_id"] = str(entry["_id"])
+            return jsonify(entries)
+
+    def post(self):
+        try:
+            new_entry = request.get_json()
+            validate(instance=new_entry, schema=cable_templates_schema)
+            cable_templates_collection.insert_one(new_entry)
+            return {"message": "Template inserted"}, 201
+        except ValidationError as e:
+            return {"message": str(e)}, 400
+
+    def put(self, cable_type):
+        if cable_type:
+            updated_data = request.get_json()
+            cable_templates_collection.update_one({"type": cable_type}, {"$set": updated_data})
+            return {"message": "Template updated"}, 200
+        else:
+            return {"message": "Template not found"}, 404
+
+    def delete(self, cable_type):
+        if cable_type:
+            result = cable_templates_collection.delete_one({"type": cable_type})
+            if result.deleted_count > 0:
+                return {"message": "Template deleted"}, 200
+            else:
+                return {"message": "Template not found"}, 404
+        else:
+            return {"message": "Template not found"}, 404
+
+# Add the resource to the API
+api.add_resource(CableTemplatesResource, "/cable_templates", "/cable_templates/<string:cable_type>")
+
 ### CUSTOM ROUTES ###
 
 
 @app.route("/addTest", methods=["POST"])
 def addTest():
+    # NOTE must be rewritten as "addRun"
     """1) create a new test from the json given by the request
     2) for every module in the modules_list field of the test object, update that module in the module collection and add the testID of the current test into the tests property of the modules (which is a list of moudule ids)
     """
