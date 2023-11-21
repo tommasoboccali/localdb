@@ -41,7 +41,7 @@ app = Flask(__name__)
 api = Api(app)
 app.json = CustomJSONProvider(app)
 # Load the schema
-with open("all_schemas.json", "r") as f:
+with open("../schemas/all_schemas.json", "r") as f:
     all_schemas = json.load(f)
 
 module_schema = all_schemas["module"]
@@ -52,7 +52,7 @@ tests_schema = all_schemas["tests"]
 cables_schema = all_schemas["cables"]
 cable_templates_schema = all_schemas["cable_templates"]
 
-load_dotenv("mongo.env")
+load_dotenv("../config/mongo.env")
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 db_name = os.environ.get("MONGO_DB_NAME")
