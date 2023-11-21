@@ -399,6 +399,7 @@ class CableTemplatesResource(Resource):
     def post(self):
         try:
             new_entry = request.get_json()
+            print(new_entry)
             validate(instance=new_entry, schema=cable_templates_schema)
             cable_templates_collection.insert_one(new_entry)
             return {"message": "Template inserted"}, 201
