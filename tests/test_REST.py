@@ -1,5 +1,7 @@
 import unittest
 from flask_testing import TestCase
+import sys
+sys.path.append("..")
 from app.flask_REST import (
     app,
     db,
