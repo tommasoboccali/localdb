@@ -239,6 +239,26 @@ class TestAPI(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json["type"], cable_type)
 
+    def test_insert_cable_no_connections(self):
+        new_cable = {
+            "name": "Test Cable",
+            "type": "exapus",
+            "detSide": [],  # No connections on the detector side
+            "crateSide": []  # No connections on the crate side
+        }
+        response = self.client.post("/cables", json=new_cable)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {"message": "Entry inserted"})
+
+        # Assuming you have an endpoint to fetch a cable by its name or another unique identifier
+        response = self.client.get(f"/cables/{new_cable['name']}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["name"], new_cable["name"])
+        self.assertEqual(response.json["type"], new_cable["type"])
+        self.assertListEqual(response.json["detSide"], new_cable["detSide"])
+        self.assertListEqual(response.json["crateSide"], new_cable["crateSide"])
+
+
 
 if __name__ == "__main__":
     unittest.main()

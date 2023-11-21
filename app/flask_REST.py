@@ -328,15 +328,15 @@ class CablesResource(Resource):
     Represents the RESTful API for interacting with the cables collection in the database.
 
     Methods:
-    - get(cableID): retrieves a single cable entry by ID or all cable entries if no ID is provided.
+    - get(name): retrieves a single cable entry by ID or all cable entries if no ID is provided.
     - post(): creates a new cable entry in the database.
-    - put(cableID): updates an existing cable entry in the database by ID.
-    - delete(cableID): deletes an existing cable entry from the database by ID.
+    - put(name): updates an existing cable entry in the database by ID.
+    - delete(name): deletes an existing cable entry from the database by ID.
     """
 
-    def get(self, cableID=None):
-        if cableID:
-            entry = cables_collection.find_one({"cableID": cableID})
+    def get(self, name=None):
+        if name:
+            entry = cables_collection.find_one({"name": name})
             if entry:
                 entry["_id"] = str(entry["_id"])  # convert ObjectId to string
                 return jsonify(entry)
@@ -357,19 +357,19 @@ class CablesResource(Resource):
         except ValidationError as e:
             return {"message": str(e)}, 400
 
-    def put(self, cableID):
-        if cableID:
+    def put(self, name):
+        if name:
             updated_data = request.get_json()
-            cables_collection.update_one({"cableID": cableID}, {"$set": updated_data})
+            cables_collection.update_one({"name": name}, {"$set": updated_data})
             return {"message": "Entry updated"}, 200
         else:
             return {"message": "Entry not found"}, 404
 
-    def delete(self, cableID):
-        if cableID:
-            entry = cables_collection.find_one({"cableID": cableID})
+    def delete(self, name):
+        if name:
+            entry = cables_collection.find_one({"name": name})
             if entry:
-                cables_collection.delete_one({"cableID": cableID})
+                cables_collection.delete_one({"name": name})
                 return {"message": "Entry deleted"}, 200
             else:
                 return {"message": "Entry not found"}, 404
@@ -377,7 +377,7 @@ class CablesResource(Resource):
             return {"message": "Entry not found"}, 404
 
 
-api.add_resource(CablesResource, "/cables", "/cables/<string:cableID>")
+api.add_resource(CablesResource, "/cables", "/cables/<string:name>")
 
 # Define the schema for validation
 
@@ -399,7 +399,6 @@ class CableTemplatesResource(Resource):
     def post(self):
         try:
             new_entry = request.get_json()
-            print(new_entry)
             validate(instance=new_entry, schema=cable_templates_schema)
             cable_templates_collection.insert_one(new_entry)
             return {"message": "Template inserted"}, 201
