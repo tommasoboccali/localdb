@@ -380,23 +380,6 @@ class CablesResource(Resource):
 api.add_resource(CablesResource, "/cables", "/cables/<string:cableID>")
 
 # Define the schema for validation
-cable_templates_schema = {
-    "type": "object",
-    "properties": {
-        "type": {
-            "type": "string",
-            "description": "Type of cable, e.g., '12-to-1'"
-        },
-        "internalRouting": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "integer"
-            },
-            "description": "Mapping of input ports to output ports"
-        }
-    },
-    "required": ["type", "internalRouting"]
-}
 
 class CableTemplatesResource(Resource):
     def get(self, cable_type=None):

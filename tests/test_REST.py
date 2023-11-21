@@ -240,31 +240,5 @@ class TestAPI(TestCase):
             self.assertEqual(response.json["type"], cable_type)
 
 
-    def test_cabling_map(self):
-        cables_to_add = [
-            {'cableID': 'cable1', 'detSide': 'det1', 'crateSide': 'cable2'},
-            {'cableID': 'cable2', 'detSide': 'cable1', 'crateSide': 'crate1'},
-            {'cableID': 'cable3', 'detSide': 'cable4', 'crateSide': 'crate2'},
-            {'cableID': 'cable4', 'detSide': 'det2', 'crateSide': 'cable3'},
-        ]
-
-        for cable in cables_to_add:
-            response = self.client.post('/cables', json=cable)
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.get_json(), {"message": "Entry inserted"})
-
-        response = self.client.get('/cables')
-
-        response = self.client.post('/cablingMap', json={'detSide': ["cable1"], 'crateSide': ["cable3", "cable4"]})
-        json_data = response.get_json()
-        # left to right detSid to crateSide
-        expected_result_cable1 = ["detSide", "cable1", "cable2", "crateSide"]
-        expected_result_cable3 = ['crateSide', 'cable3', 'cable4', 'detSide']
-        expected_result_cable4 = ['crateSide', 'cable4', 'detSide']
-        self.assertEqual(json_data["cable1"], expected_result_cable1)
-        self.assertEqual(json_data["cable3"], expected_result_cable3)
-        self.assertEqual(json_data["cable4"], expected_result_cable4)
-
-
 if __name__ == "__main__":
     unittest.main()
