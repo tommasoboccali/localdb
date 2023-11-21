@@ -118,7 +118,6 @@
             }
         },
         "required": [
-            "_id",
             "type",
             "detSide",
             "crateSide"
