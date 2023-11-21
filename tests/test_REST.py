@@ -232,7 +232,7 @@ class TestAPI(TestCase):
             response = self.client.post("/cable_templates", json=template)
             self.assertEqual(response.status_code, 201)
             self.assertIn("message", response.json)
-            self.assertEqual(response.json["message"], "Cable template inserted")
+            self.assertEqual(response.json["message"], "Template inserted")
 
             cable_type = template["type"]
             response = self.client.get(f"/cable_templates/{cable_type}")
