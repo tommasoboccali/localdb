@@ -3,14 +3,13 @@ from flask_testing import TestCase
 from app.flask_REST import (
     app,
     db,
-)  # replace 'your_flask_app_file' with the actual name of your Flask app file
-
+) 
 
 class TestAPI(TestCase):
     def create_app(self):
         app.config["TESTING"] = True
         app.config["MONGODB_SETTINGS"] = {
-            "db": "test_db"  # replace with your test database name
+            "db": "unittest_db"  # replace with your test database name
         }
         return app
 
