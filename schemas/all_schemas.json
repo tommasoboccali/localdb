@@ -134,7 +134,7 @@
             "internalRouting": {
                 "type": "object",
                 "additionalProperties": {
-                    "type": "integer"
+                    "type": ["integer", "array"]
                 },
                 "description": "Mapping of input ports to output ports"
             }
