@@ -354,7 +354,7 @@ class CablesResource(Resource):
             validate(instance=new_entry, schema=cables_schema)
             cables_collection.insert_one(new_entry)
             return {"message": "Entry inserted"}, 201
-        except ValidationError as e:PUnbFjK!@aWH97zN
+        except ValidationError as e:
             return {"message": str(e)}, 400
 
     def put(self, name):
