@@ -542,13 +542,13 @@ def traverse_cables(cable, side, port):
 
     # Find connected cables and continue traversal
     path = [cable["name"]]
-    for next_port in next_ports:
-        opposite_side = "detSide" if side == "crateSide" else "crateSide"
-        next_cable_connection = next((conn for conn in cable[opposite_side] if conn["port"] == next_port), None)
-        if next_cable_connection:
-            next_cable = cables_collection.find_one({"_id": next_cable_connection["connectedTo"]})
-            if next_cable:
-                path.extend(traverse_cables(next_cable, opposite_side, next_cable_connection["port"]))
+    # for next_port in next_ports:
+    opposite_side = "detSide" if side == "crateSide" else "crateSide"
+    next_cable_connection = next((conn for conn in cable[opposite_side] if conn["port"] == next_port), None)
+    if next_cable_connection:
+        next_cable = cables_collection.find_one({"_id": next_cable_connection["connectedTo"]})
+        if next_cable:
+            path.extend(traverse_cables(next_cable, opposite_side, next_cable_connection["port"]))
     return path
     
 @app.route("/cablingSnapshot", methods=["POST"])
