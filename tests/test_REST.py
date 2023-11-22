@@ -358,6 +358,8 @@ class TestAPI(TestCase):
             "/cablingSnapshot",
             json={"starting_point_name": "Module 1", "starting_side": "detSide"},
         )
+        print(snapshot_module.json)
+        print(snapshot_module)
         self.assertEqual(snapshot_module.status_code, 200)
         self.assertEqual(snapshot_module.json["cablingPath"], ["Cable 1", "Cable 2"])
 
