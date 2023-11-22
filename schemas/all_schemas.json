@@ -47,6 +47,9 @@
             },
             "tests": {
                 "type": "array"
+            },
+            "connectedTo": {
+                "type": "array"
             }
         },
         "required": [

@@ -306,6 +306,65 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         connection_not_exists = all(conn["port"] != 1 or conn["connectedTo"] != cable2_id for conn in response.json["crateSide"])
         self.assertTrue(connection_not_exists)
+    
+    def test_cabling_snapshot(self):
+        # 1. Create module, crate, and cables
+        module = {"name": "Module 1", "connectedTo": "Cable 1"}
+        crate = {"name": "Crate 1", "connectedTo": "Cable 2"}
+        cables = [
+            {"name": "Cable 1", "type": "extfib", "detSide": [], "crateSide": []},
+            {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []}
+        ]
+
+        self.client.post("/modules", json=module)
+        self.client.post("/crates", json=crate)
+        for cable in cables:
+            self.client.post("/cables", json=cable)
+
+        # 2. Connect the cables
+        connect_data = {
+            "cable1_name": "Cable 1",
+            "cable1_port": 1,
+            "cable1_side": "crateSide",
+            "cable2_name": "Cable 2",
+            "cable2_port": 1
+        }
+        self.client.post("/connectCables", json=connect_data)
+
+        # 3. Perform the three snapshots
+        # Snapshot from Module
+        snapshot_module = self.client.post("/cablingSnapshot", json={
+            "starting_point_name": "Module 1",
+            "starting_side": "detSide"
+        })
+        self.assertEqual(snapshot_module.status_code, 200)
+        self.assertEqual(snapshot_module.json['cablingPath'], ["Cable 1", "Cable 2"])
+
+        # Snapshot from Crate
+        snapshot_crate = self.client.post("/cablingSnapshot", json={
+            "starting_point_name": "Crate 1",
+            "starting_side": "crateSide"
+        })
+        self.assertEqual(snapshot_crate.status_code, 200)
+        self.assertEqual(snapshot_crate.json['cablingPath'], ["Cable 2", "Cable 1"])
+
+        # Snapshot from Cable (detSide)
+        snapshot_cable_det = self.client.post("/cablingSnapshot", json={
+            "starting_point_name": "Cable 1",
+            "starting_side": "detSide",
+            "starting_port": 1
+        })
+        self.assertEqual(snapshot_cable_det.status_code, 200)
+        self.assertEqual(snapshot_cable_det.json['cablingPath'], ["Cable 1", "Cable 2"])
+
+        # Snapshot from Cable (crateSide)
+        snapshot_cable_crate = self.client.post("/cablingSnapshot", json={
+            "starting_point_name": "Cable 2",
+            "starting_side": "crateSide",
+            "starting_port": 1
+        })
+        self.assertEqual(snapshot_cable_crate.status_code, 200)
+        self.assertEqual(snapshot_cable_crate.json['cablingPath'], ["Cable 2", "Cable 1"])
 
 
 if __name__ == "__main__":

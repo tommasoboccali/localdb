@@ -71,6 +71,7 @@ connection_snapshot_collection = db["connection_snapshot"]
 tests_collection = db["tests"]
 cables_collection = db["cables"]
 cable_templates_collection = db["cable_templates"]
+crates_collection = db["crates"]
 
 
 class ModulesResource(Resource):
@@ -526,44 +527,57 @@ def addTest():
     except ValidationError as e:
         return {"message": str(e)}, 400
 
+# Recursive function to traverse through cables
+def traverse_cables(cable, side, port):
+    # Fetch all cable templates
+    cable_templates = list(cable_templates_collection.find({}))
+    # Determine the next port using the cable template
+    cable_template = next((ct for ct in cable_templates if ct["type"] == cable["type"]), None)
+    if not cable_template:
+        return [cable["name"]]  # End traversal if no matching template
 
-@app.route("/cablingMap", methods=["POST"])
-def cabling_map():
-    request_data = request.get_json()
-    detector_side_cables = request_data.get("detSide", [])
-    crate_side_cables = request_data.get("crateSide", [])
-    map_of_cabling = {}
+    next_ports = cable_template["internalRouting"].get(str(port), [])
+    if not next_ports:
+        return [cable["name"]]  # End traversal if no matching port
 
-    for cable_id in detector_side_cables:
-        current_cable_id = cables_collection.find_one({"cableID": cable_id})["cableID"]
-        map_of_cabling[current_cable_id] = ["detSide", current_cable_id]
-        next_cable_in_chain = cables_collection.find_one({"detSide": current_cable_id})
+    # Find connected cables and continue traversal
+    path = [cable["name"]]
+    for next_port in next_ports:
+        opposite_side = "detSide" if side == "crateSide" else "crateSide"
+        next_cable_connection = next((conn for conn in cable[opposite_side] if conn["port"] == next_port), None)
+        if next_cable_connection:
+            next_cable = cables_collection.find_one({"_id": next_cable_connection["connectedTo"]})
+            if next_cable:
+                path.extend(traverse_cables(next_cable, opposite_side, next_cable_connection["port"]))
+    return path
+    
+@app.route("/cablingSnapshot", methods=["POST"])
+def cabling_snapshot():
+    data = request.get_json()
+    starting_point_name = data.get('starting_point_name')
+    starting_side = data.get('starting_side')  # 'detSide' or 'crateSide'
+    starting_port = data.get('starting_port', 1)  # Default to port 1 if not specified
 
-        while next_cable_in_chain is not None:
-            map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
-            next_cable_in_chain = cables_collection.find_one(
-                {"detSide": next_cable_in_chain["cableID"]}
-            )
+    # Try to find the starting point in modules, crates, or cables
+    starting_point = modules_collection.find_one({"name": starting_point_name}) or \
+                     crates_collection.find_one({"name": starting_point_name}) or \
+                     cables_collection.find_one({"name": starting_point_name})
 
-        map_of_cabling[current_cable_id].append("crateSide")
+    if not starting_point:
+        return {"message": "Starting point not found"}, 404
 
-    for cable_id in crate_side_cables:
-        current_cable_id = cables_collection.find_one({"cableID": cable_id})["cableID"]
-        map_of_cabling[current_cable_id] = ["crateSide", current_cable_id]
-        next_cable_in_chain = cables_collection.find_one(
-            {"crateSide": current_cable_id}
-        )
+    if "connectedTo" in starting_point:  # For modules or crates
+        connected_cable_name = starting_point["connectedTo"]
+        starting_cable = cables_collection.find_one({"name": connected_cable_name})
+        if not starting_cable:
+            return {"message": "Connected cable not found"}, 404
+    else:  # For cables
+        starting_cable = starting_point
 
-        while next_cable_in_chain is not None:
-            map_of_cabling[current_cable_id].append(next_cable_in_chain["cableID"])
-            next_cable_in_chain = cables_collection.find_one(
-                {"crateSide": next_cable_in_chain["cableID"]}
-            )
+        # Start traversing from the specified starting point
+    cabling_path = traverse_cables(starting_cable, starting_side, starting_port)
 
-        map_of_cabling[current_cable_id].append("detSide")
-
-    return jsonify(map_of_cabling)
-
+    return {"cablingPath": cabling_path}, 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005, debug=False)
