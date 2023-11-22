@@ -508,7 +508,7 @@ def connect_cables():
             # Update the other cable
             cables_collection.update_one(
                 {"_id": other_cable_id},
-                {"$push": {other_side: {"port": other_port, "connectedTo": cable_name, "type": "cable"}}}
+                {"$push": {other_side: {"port": other_port, "connectedTo": cable_id, "type": "cable"}}}
             )
 
     return {"message": "Cables connected"}, 200
