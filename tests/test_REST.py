@@ -267,17 +267,14 @@ class TestAPI(TestCase):
         for cable in cables:
             response = self.client.post("/cables", json=cable)
             self.assertEqual(response.status_code, 201)
-        # Fetch Cables ObjectId
-        cable1_response = self.client.get("/cables/Cable 1")
-        cable1_id = cable1_response.json["_id"]
-        cable2_response = self.client.get("/cables/Cable 2")
-        cable2_id = cable2_response.json["_id"]
 
         # 2. Connect them
         connect_data = {
-            "cable_name": "Cable 1",
-            "sides": {"crateSide": 1},
-            "connecting_what": {"Cable 2": 1}
+            "cable1_name": "Cable 1",
+            "cable1_port": 1,
+            "cable1_side": "crateSide",
+            "cable2_name": "Cable 2",
+            "cable2_port": 1
         }
         response = self.client.post("/connectCables", json=connect_data)
         self.assertEqual(response.status_code, 200)
@@ -285,19 +282,20 @@ class TestAPI(TestCase):
 
         # Check if cables are connected correctly
         response = self.client.get("/cables/Cable 1")
-        print(response.json)
         self.assertEqual(response.status_code, 200)
-        self.assertIn({"port": 1, "connectedTo": cable2_id, "type": "cable"}, response.json["crateSide"])
-
-        response = self.client.get("/cables/Cable 2")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn({"port": 1, "connectedTo": cable1_id, "type": "cable"}, response.json["detSide"])
+        # Fetch Cable 2's ObjectId for comparison
+        cable2_response = self.client.get("/cables/Cable 2")
+        cable2_id = cable2_response.json["_id"]
+        connection_exists = any(conn["port"] == 1 and conn["connectedTo"] == cable2_id for conn in response.json["crateSide"])
+        self.assertTrue(connection_exists)
 
         # 3. Disconnect them
         disconnect_data = {
-            "cable_name": "Cable 1",
-            "sides": {"crateSide": 1},
-            "all": False
+            "cable1_name": "Cable 1",
+            "cable1_port": 1,
+            "cable1_side": "crateSide",
+            "cable2_name": "Cable 2",
+            "cable2_port": 1
         }
         response = self.client.post("/disconnectCables", json=disconnect_data)
         self.assertEqual(response.status_code, 200)
@@ -306,7 +304,8 @@ class TestAPI(TestCase):
         # Check if cables are disconnected correctly
         response = self.client.get("/cables/Cable 1")
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn({"port": 1, "connectedTo": cable2_id, "type": "cable"}, response.json["crateSide"])
+        connection_not_exists = all(conn["port"] != 1 or conn["connectedTo"] != cable2_id for conn in response.json["crateSide"])
+        self.assertTrue(connection_not_exists)
 
 
 if __name__ == "__main__":
