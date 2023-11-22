@@ -280,6 +280,7 @@ class TestAPI(TestCase):
 
         # Check if cables are connected correctly
         response = self.client.get("/cables/Cable 1")
+        print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertIn({"port": 1, "connectedTo": "Cable 2", "type": "cable"}, response.json["crateSide"])
 
