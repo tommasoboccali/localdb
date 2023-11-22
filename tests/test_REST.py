@@ -258,6 +258,49 @@ class TestAPI(TestCase):
         self.assertListEqual(response.json["detSide"], new_cable["detSide"])
         self.assertListEqual(response.json["crateSide"], new_cable["crateSide"])
 
+    def test_create_connect_disconnect_cables(self):
+        # 1. Create some cables
+        cables = [
+            {"name": "Cable 1", "type": "12-to-1", "detSide": [], "crateSide": []},
+            {"name": "Cable 2", "type": "12-to-1", "detSide": [], "crateSide": []}
+        ]
+        for cable in cables:
+            response = self.client.post("/cables", json=cable)
+            self.assertEqual(response.status_code, 201)
+
+        # 2. Connect them
+        connect_data = {
+            "cable_name": "Cable 1",
+            "sides": {"crateSide": 1},
+            "connecting_what": {"Cable 2": 1}
+        }
+        response = self.client.post("/connectCables", json=connect_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {"message": "Cables connected"})
+
+        # Check if cables are connected correctly
+        response = self.client.get("/cables/Cable 1")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn({"port": 1, "connectedTo": "Cable 2", "type": "cable"}, response.json["crateSide"])
+
+        response = self.client.get("/cables/Cable 2")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn({"port": 1, "connectedTo": "Cable 1", "type": "cable"}, response.json["detSide"])
+
+        # 3. Disconnect them
+        disconnect_data = {
+            "cable_name": "Cable 1",
+            "sides": {"crateSide": 1},
+            "all": False
+        }
+        response = self.client.post("/disconnectCables", json=disconnect_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {"message": "Cable disconnected"})
+
+        # Check if cables are disconnected correctly
+        response = self.client.get("/cables/Cable 1")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn({"port": 1, "connectedTo": "Cable 2", "type": "cable"}, response.json["crateSide"])
 
 
 if __name__ == "__main__":

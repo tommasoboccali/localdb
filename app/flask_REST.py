@@ -354,7 +354,7 @@ class CablesResource(Resource):
             validate(instance=new_entry, schema=cables_schema)
             cables_collection.insert_one(new_entry)
             return {"message": "Entry inserted"}, 201
-        except ValidationError as e:
+        except ValidationError as e:PUnbFjK!@aWH97zN
             return {"message": str(e)}, 400
 
     def put(self, name):
@@ -427,6 +427,91 @@ class CableTemplatesResource(Resource):
 api.add_resource(CableTemplatesResource, "/cable_templates", "/cable_templates/<string:cable_type>")
 
 ### CUSTOM ROUTES ###
+
+@app.route("/disconnectCables", methods=["POST"])
+def disconnect():
+    """        disconnect_data = {
+            "cable_name": name,
+            "sides": {"crateSide":1, "crateSide":2, "detSide":3, }, # what side and which port I am disconnecting
+            "all": False #disconnect all ports on all sides
+        }
+    """
+    data = request.get_json()
+    cable_name = data.get('cable_name')
+    sides_to_disconnect = data.get('sides', {})
+    disconnect_all = data.get('all', False)
+
+    # Fetch the cable to be disconnected
+    cable = cables_collection.find_one({"name": cable_name})
+
+    if disconnect_all:
+        update = {"$set": {"detSide": [], "crateSide": []}}
+        # Iterate through all connections of the target cable and remove references from other cables
+        for side in ["detSide", "crateSide"]:
+            for connection in cable[side]:
+                other_cable_id= connection["connectedTo"]
+                other_side = "detSide" if side == "crateSide" else "crateSide"
+
+                # Find and update the other cable to remove the reference to the target cable
+                other_cable = cables_collection.find_one({"_id": other_cable_id})
+                if other_cable:
+                    cables_collection.update_one(
+                        {"_id": other_cable["_id"]},
+                        {"$pull": {other_side: {"connectedTo": cable_name}}}
+                    )
+    else:
+        update = {"$pull": {}}
+        for side, port in sides_to_disconnect.items():
+            update["$pull"][side] = {"port": port}
+
+            # Additional logic to disconnect the other side of the cable
+            for connection in cable[side]:
+                if connection["port"] == port:
+                    other_cable = cables_collection.find_one({"_id": connection["connectedTo"]})
+                    other_side = "detSide" if side == "crateSide" else "crateSide"
+                    cables_collection.update_one(
+                        {"_id": other_cable["_id"]},
+                        {"$pull": {other_side: {"connectedTo": cable_name}}}
+                    )
+
+    cables_collection.update_one({"_id": cable["_id"]}, update)
+    return {"message": "Cable disconnected"}, 200
+
+@app.route("/connectCables", methods=["POST"])
+def connect_cables():
+    """connect_data = {
+            "cable_name": name,
+            "sides": {"detSide":3, "crateSide":2, "detSide":5, }, # which side and which port connecting
+            "connecting_what": {"cable1name":1, "cable2name":2, "cable3name":3}, # to which cable on their ports (side is the opposite of the one in sides)            
+        }
+    """
+    data = request.get_json()
+    cable_name = data.get('cable_name')
+    sides_to_connect = data.get('sides', {})
+    connecting_what = data.get('connecting_what', {})
+
+    cable = cables_collection.find_one({"name": cable_name})
+    cable_id = cable["_id"]
+
+    for (side, port), (other_cable_name, other_port) in zip(sides_to_connect.items(), connecting_what.items()):
+        other_side = "detSide" if side == "crateSide" else "crateSide"
+        other_cable = cables_collection.find_one({"name": other_cable_name})
+        other_cable_id = other_cable["_id"] if other_cable else None
+
+        # Update the cable
+        if other_cable_id:
+            cables_collection.update_one(
+                {"_id": cable_id},
+                {"$push": {side: {"port": port, "connectedTo": other_cable_id, "type": "cable"}}}
+            )
+
+            # Update the other cable
+            cables_collection.update_one(
+                {"_id": other_cable_id},
+                {"$push": {other_side: {"port": other_port, "connectedTo": cable_name, "type": "cable"}}}
+            )
+
+    return {"message": "Cables connected"}, 200
 
 
 @app.route("/addTest", methods=["POST"])
