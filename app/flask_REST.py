@@ -559,7 +559,7 @@ def cabling_snapshot():
     starting_port = data.get('starting_port', 1)  # Default to port 1 if not specified
 
     # Try to find the starting point in modules, crates, or cables
-    starting_point = modules_collection.find_one({"name": starting_point_name}) or \
+    starting_point = modules_collection.find_one({"moduleID": starting_point_name}) or \
                      crates_collection.find_one({"name": starting_point_name}) or \
                      cables_collection.find_one({"name": starting_point_name})
 

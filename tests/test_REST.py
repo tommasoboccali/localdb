@@ -1,11 +1,13 @@
 import unittest
 from flask_testing import TestCase
 import sys
+
 sys.path.append("..")
 from app.flask_REST import (
     app,
     db,
-) 
+)
+
 
 class TestAPI(TestCase):
     def create_app(self):
@@ -49,7 +51,7 @@ class TestAPI(TestCase):
 
         response = self.client.get("/modules/INV001")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["moduleID"], "INV001")       
+        self.assertEqual(response.json["moduleID"], "INV001")
 
     def test_fetch_specific_module_not_found(self):
         response = self.client.get("/modules/INV999")
@@ -61,7 +63,11 @@ class TestAPI(TestCase):
         self.assertEqual(response.json, {"message": "Module deleted"})
 
     def test_insert_log(self):
-        new_log = {"timestamp": "2023-11-03T14:21:29Z", "event": "Module added", "operator": "John Doe"}
+        new_log = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+        }
         response = self.client.post("/logbook", json=new_log)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, {"message": "Log inserted"})
@@ -76,7 +82,11 @@ class TestAPI(TestCase):
 
     def test_delete_log(self):
         # First, let's insert a log entry
-        new_log = {"timestamp": "2023-11-03T14:21:29Z", "event": "Module added", "operator": "John Doe"}
+        new_log = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+        }
         self.client.post("/logbook", json=new_log)
 
         # Now, let's delete it
@@ -91,7 +101,7 @@ class TestAPI(TestCase):
             "testType": "Type1",
             "testDate": "2023-11-01",
             "testStatus": "completed",
-            "testResults": {}
+            "testResults": {},
         }
 
         # Insert
@@ -103,7 +113,7 @@ class TestAPI(TestCase):
         response = self.client.get("/tests/T001")
         retrieved_test = response.get_json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(retrieved_test['testID'], "T001")
+        self.assertEqual(retrieved_test["testID"], "T001")
 
     def test_delete_test(self):
         # Delete
@@ -113,7 +123,7 @@ class TestAPI(TestCase):
             "testType": "Type1",
             "testDate": "2023-11-01",
             "testStatus": "completed",
-            "testResults": {}
+            "testResults": {},
         }
 
         # Insert
@@ -147,9 +157,9 @@ class TestAPI(TestCase):
             "testType": "Type1",
             "testDate": "2023-11-01",
             "testStatus": "completed",
-            "testResults": {}
+            "testResults": {},
         }
-        # create modules 
+        # create modules
         new_module = {
             "moduleID": "M1",
             "position": "cleanroom",
@@ -177,7 +187,7 @@ class TestAPI(TestCase):
         response = self.client.get("/modules/M1")
         retrieved_module = response.get_json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(retrieved_module['tests'], ["T001"])
+        self.assertEqual(retrieved_module["tests"], ["T001"])
 
     def test_insert_cable_templates(self):
         cable_templates = [
@@ -189,8 +199,8 @@ class TestAPI(TestCase):
                     "3": [5, 6],
                     "4": [7, 8],
                     "5": [9, 10],
-                    "6": [11, 12]
-                }
+                    "6": [11, 12],
+                },
             },
             {
                 "type": "extfib",
@@ -206,8 +216,8 @@ class TestAPI(TestCase):
                     "9": 9,
                     "10": 10,
                     "11": 11,
-                    "12": 12
-                }
+                    "12": 12,
+                },
             },
             {
                 "type": "dodecapus",
@@ -223,9 +233,9 @@ class TestAPI(TestCase):
                     "9": 1,
                     "10": 4,
                     "11": 7,
-                    "12": 10
-                }
-            }
+                    "12": 10,
+                },
+            },
         ]
 
         for template in cable_templates:
@@ -244,7 +254,7 @@ class TestAPI(TestCase):
             "name": "Test Cable",
             "type": "exapus",
             "detSide": [],  # No connections on the detector side
-            "crateSide": []  # No connections on the crate side
+            "crateSide": [],  # No connections on the crate side
         }
         response = self.client.post("/cables", json=new_cable)
         self.assertEqual(response.status_code, 201)
@@ -262,7 +272,7 @@ class TestAPI(TestCase):
         # 1. Create some cables
         cables = [
             {"name": "Cable 1", "type": "12-to-1", "detSide": [], "crateSide": []},
-            {"name": "Cable 2", "type": "12-to-1", "detSide": [], "crateSide": []}
+            {"name": "Cable 2", "type": "12-to-1", "detSide": [], "crateSide": []},
         ]
         for cable in cables:
             response = self.client.post("/cables", json=cable)
@@ -274,7 +284,7 @@ class TestAPI(TestCase):
             "cable1_port": 1,
             "cable1_side": "crateSide",
             "cable2_name": "Cable 2",
-            "cable2_port": 1
+            "cable2_port": 1,
         }
         response = self.client.post("/connectCables", json=connect_data)
         self.assertEqual(response.status_code, 200)
@@ -286,7 +296,10 @@ class TestAPI(TestCase):
         # Fetch Cable 2's ObjectId for comparison
         cable2_response = self.client.get("/cables/Cable 2")
         cable2_id = cable2_response.json["_id"]
-        connection_exists = any(conn["port"] == 1 and conn["connectedTo"] == cable2_id for conn in response.json["crateSide"])
+        connection_exists = any(
+            conn["port"] == 1 and conn["connectedTo"] == cable2_id
+            for conn in response.json["crateSide"]
+        )
         self.assertTrue(connection_exists)
 
         # 3. Disconnect them
@@ -295,7 +308,7 @@ class TestAPI(TestCase):
             "cable1_port": 1,
             "cable1_side": "crateSide",
             "cable2_name": "Cable 2",
-            "cable2_port": 1
+            "cable2_port": 1,
         }
         response = self.client.post("/disconnectCables", json=disconnect_data)
         self.assertEqual(response.status_code, 200)
@@ -304,16 +317,24 @@ class TestAPI(TestCase):
         # Check if cables are disconnected correctly
         response = self.client.get("/cables/Cable 1")
         self.assertEqual(response.status_code, 200)
-        connection_not_exists = all(conn["port"] != 1 or conn["connectedTo"] != cable2_id for conn in response.json["crateSide"])
+        connection_not_exists = all(
+            conn["port"] != 1 or conn["connectedTo"] != cable2_id
+            for conn in response.json["crateSide"]
+        )
         self.assertTrue(connection_not_exists)
-    
+
     def test_cabling_snapshot(self):
         # 1. Create module, crate, and cables
-        module = {"name": "Module 1", "connectedTo": "Cable 1"}
+        module = {
+            "moduleID": "Module 1",
+            "position": "cleanroom",
+            "status": "readyformount",
+            "connectedTo": "Cable 1",
+        }
         crate = {"name": "Crate 1", "connectedTo": "Cable 2"}
         cables = [
             {"name": "Cable 1", "type": "extfib", "detSide": [], "crateSide": []},
-            {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []}
+            {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []},
         ]
 
         self.client.post("/modules", json=module)
@@ -327,44 +348,52 @@ class TestAPI(TestCase):
             "cable1_port": 1,
             "cable1_side": "crateSide",
             "cable2_name": "Cable 2",
-            "cable2_port": 1
+            "cable2_port": 1,
         }
         self.client.post("/connectCables", json=connect_data)
 
         # 3. Perform the three snapshots
         # Snapshot from Module
-        snapshot_module = self.client.post("/cablingSnapshot", json={
-            "starting_point_name": "Module 1",
-            "starting_side": "detSide"
-        })
+        snapshot_module = self.client.post(
+            "/cablingSnapshot",
+            json={"starting_point_name": "Module 1", "starting_side": "detSide"},
+        )
         self.assertEqual(snapshot_module.status_code, 200)
-        self.assertEqual(snapshot_module.json['cablingPath'], ["Cable 1", "Cable 2"])
+        self.assertEqual(snapshot_module.json["cablingPath"], ["Cable 1", "Cable 2"])
 
         # Snapshot from Crate
-        snapshot_crate = self.client.post("/cablingSnapshot", json={
-            "starting_point_name": "Crate 1",
-            "starting_side": "crateSide"
-        })
+        snapshot_crate = self.client.post(
+            "/cablingSnapshot",
+            json={"starting_point_name": "Crate 1", "starting_side": "crateSide"},
+        )
         self.assertEqual(snapshot_crate.status_code, 200)
-        self.assertEqual(snapshot_crate.json['cablingPath'], ["Cable 2", "Cable 1"])
+        self.assertEqual(snapshot_crate.json["cablingPath"], ["Cable 2", "Cable 1"])
 
         # Snapshot from Cable (detSide)
-        snapshot_cable_det = self.client.post("/cablingSnapshot", json={
-            "starting_point_name": "Cable 1",
-            "starting_side": "detSide",
-            "starting_port": 1
-        })
+        snapshot_cable_det = self.client.post(
+            "/cablingSnapshot",
+            json={
+                "starting_point_name": "Cable 1",
+                "starting_side": "detSide",
+                "starting_port": 1,
+            },
+        )
         self.assertEqual(snapshot_cable_det.status_code, 200)
-        self.assertEqual(snapshot_cable_det.json['cablingPath'], ["Cable 1", "Cable 2"])
+        self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 1", "Cable 2"])
 
         # Snapshot from Cable (crateSide)
-        snapshot_cable_crate = self.client.post("/cablingSnapshot", json={
-            "starting_point_name": "Cable 2",
-            "starting_side": "crateSide",
-            "starting_port": 1
-        })
+        snapshot_cable_crate = self.client.post(
+            "/cablingSnapshot",
+            json={
+                "starting_point_name": "Cable 2",
+                "starting_side": "crateSide",
+                "starting_port": 1,
+            },
+        )
         self.assertEqual(snapshot_cable_crate.status_code, 200)
-        self.assertEqual(snapshot_cable_crate.json['cablingPath'], ["Cable 2", "Cable 1"])
+        self.assertEqual(
+            snapshot_cable_crate.json["cablingPath"], ["Cable 2", "Cable 1"]
+        )
 
 
 if __name__ == "__main__":
