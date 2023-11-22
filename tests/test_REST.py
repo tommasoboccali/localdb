@@ -337,7 +337,8 @@ class TestAPI(TestCase):
             {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []},
         ]
 
-        self.client.post("/modules", json=module)
+        module_insert = self.client.post("/modules", json=module)
+        print(module_insert)
         self.client.post("/crates", json=crate)
         for cable in cables:
             self.client.post("/cables", json=cable)
