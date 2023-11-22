@@ -536,8 +536,8 @@ def traverse_cables(cable, side, port):
     if not cable_template:
         return [cable["name"]]  # End traversal if no matching template
 
-    next_ports = cable_template["internalRouting"].get(str(port), [])
-    if not next_ports:
+    next_port = cable_template["internalRouting"].get(str(port), [])
+    if not next_port:
         return [cable["name"]]  # End traversal if no matching port
 
     # Find connected cables and continue traversal
