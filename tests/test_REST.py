@@ -350,17 +350,19 @@ class TestAPI(TestCase):
 
         module_insert = self.client.post("/modules", json=module)
         crate_insert = self.client.post("/crates", json=crate)
-        print(crate_insert.json)
 
+        # get crate and module ids
+        module_id = self.client.get("/modules/Module 1").json["_id"]
+        crate_id = self.client.get("/crates/Crate 1").json["_id"]
         # add module and crate to the cables
         crate_conn= {
             "port": 1,
-            "connectedTo": ObjectId(crate_insert.json["_id"]),
+            "connectedTo": crate_id,
             "type": "crate"
         }
         module_conn= {
             "port": 2,
-            "connectedTo": ObjectId(module_insert.json["_id"]),
+            "connectedTo": module_id,
             "type": "module"
         }
 
