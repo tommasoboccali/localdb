@@ -350,6 +350,7 @@ class TestAPI(TestCase):
 
         module_insert = self.client.post("/modules", json=module)
         crate_insert = self.client.post("/crates", json=crate)
+        print(crate_insert.json)
 
         # add module and crate to the cables
         crate_conn= {
