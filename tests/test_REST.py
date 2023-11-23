@@ -347,7 +347,6 @@ class TestAPI(TestCase):
         }
         crate = {"name": "Crate 1", "connectedTo": cable4_id}
 
-
         module_insert = self.client.post("/modules", json=module)
         crate_insert = self.client.post("/crates", json=crate)
 
@@ -417,7 +416,7 @@ class TestAPI(TestCase):
         print(snapshot_module.json)
         print(snapshot_module)
         self.assertEqual(snapshot_module.status_code, 200)
-        self.assertEqual(snapshot_module.json["cablingPath"], ["Module 1", "Cable 3", "Cable 4"])
+        self.assertEqual(snapshot_module.json["cablingPath"], ["Module 1", "Cable 3", "Cable 4"]) # add crate at end
 
         # Snapshot from Crate
         snapshot_crate = self.client.post(
