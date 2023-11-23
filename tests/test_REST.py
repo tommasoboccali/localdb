@@ -403,7 +403,7 @@ class TestAPI(TestCase):
         response = self.client.get("/cables/Cable 3")
         self.assertEqual(response.status_code, 200)
         connection_exists = any(
-            conn["port"] == 1 and conn["connectedTo"] == cable4_id
+            conn["port"] == 2 and conn["connectedTo"] == cable4_id
             for conn in response.json["crateSide"]
         )
         self.assertTrue(connection_exists)
