@@ -7,6 +7,7 @@ from app.flask_REST import (
     app,
     db,
 )
+from bson import ObjectId
 
 
 class TestAPI(TestCase):
@@ -348,8 +349,22 @@ class TestAPI(TestCase):
 
 
         module_insert = self.client.post("/modules", json=module)
-        self.client.post("/crates", json=crate)
+        crate_insert = self.client.post("/crates", json=crate)
 
+        # add module and crate to the cables
+        crate_conn= {
+            "port": 1,
+            "connectedTo": ObjectId(crate_insert.json["_id"]),
+            "type": "crate"
+        }
+        module_conn= {
+            "port": 2,
+            "connectedTo": ObjectId(module_insert.json["_id"]),
+            "type": "module"
+        }
+
+        self.client.put(f"/cables/Cable 4/crateSide", json=crate_conn)
+        self.client.put(f"/cables/Cable 3/detSide", json=module_conn)
         # 
         # 2. Connect the cables
         connect_data = {
