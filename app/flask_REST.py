@@ -398,7 +398,6 @@ class CratesResource(Resource):
     def post(self):
         try:
             new_entry = request.get_json()
-            validate(instance=new_entry, schema=cables_schema)
             crates_collection.insert_one(new_entry)
             return {"message": "Entry inserted"}, 201
         except ValidationError as e:
