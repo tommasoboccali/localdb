@@ -727,6 +727,8 @@ def cabling_snapshot():
         )
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
+        if not next_cable:
+            break
         next_port = next(
             (
                 conn["port"]
