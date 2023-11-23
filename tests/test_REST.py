@@ -378,7 +378,7 @@ class TestAPI(TestCase):
         print(snapshot_module.json)
         print(snapshot_module)
         self.assertEqual(snapshot_module.status_code, 200)
-        self.assertEqual(snapshot_module.json["cablingPath"], ["Cable 3", "Cable 4"])
+        self.assertEqual(snapshot_module.json["cablingPath"], ["Module 1", "Cable 3", "Cable 4"])
 
         # Snapshot from Crate
         snapshot_crate = self.client.post(

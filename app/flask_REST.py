@@ -586,12 +586,13 @@ def cabling_snapshot():
         path.append(next_cable["name"])
         # Determine the next port using the cable template
         cable_template = next((ct for ct in cable_templates if ct["type"] == next_cable["type"]), None)
+        print(cable_template)
         if starting_side == "detSide":
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
             routing = cable_template["internalRouting"]
             next_port = next((port for port, connections in routing.items() if next_port in connections), None)
-        
+        print(starting_port, next_port)
         if not next_port:
             break
 
