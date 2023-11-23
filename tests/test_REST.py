@@ -326,16 +326,16 @@ class TestAPI(TestCase):
     def test_cabling_snapshot(self):
         # 1. Create module, crate, and cables
         cables = [
-            {"name": "Cable 1", "type": "extfib", "detSide": [], "crateSide": []},
-            {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []},
+            {"name": "Cable 3", "type": "extfib", "detSide": [], "crateSide": []},
+            {"name": "Cable 4", "type": "extfib", "detSide": [], "crateSide": []},
         ]
         for cable in cables:
             self.client.post("/cables", json=cable)
         
         # get the cables ids
-        cable1_response = self.client.get("/cables/Cable 1")
+        cable1_response = self.client.get("/cables/Cable 3")
         cable1_id = cable1_response.json["_id"]
-        cable2_response = self.client.get("/cables/Cable 2")
+        cable2_response = self.client.get("/cables/Cable 4")
         cable2_id = cable2_response.json["_id"]
 
         module = {
@@ -353,10 +353,10 @@ class TestAPI(TestCase):
 
         # 2. Connect the cables
         connect_data = {
-            "cable1_name": "Cable 1",
+            "cable1_name": "Cable 3",
             "cable1_port": 1,
             "cable1_side": "crateSide",
-            "cable2_name": "Cable 2",
+            "cable2_name": "Cable 4",
             "cable2_port": 1,
         }
         self.client.post("/connectCables", json=connect_data)
@@ -370,7 +370,7 @@ class TestAPI(TestCase):
         print(snapshot_module.json)
         print(snapshot_module)
         self.assertEqual(snapshot_module.status_code, 200)
-        self.assertEqual(snapshot_module.json["cablingPath"], ["Cable 1", "Cable 2"])
+        self.assertEqual(snapshot_module.json["cablingPath"], ["Cable 3", "Cable 4"])
 
         # Snapshot from Crate
         snapshot_crate = self.client.post(
@@ -378,32 +378,32 @@ class TestAPI(TestCase):
             json={"starting_point_name": "Crate 1", "starting_side": "crateSide"},
         )
         self.assertEqual(snapshot_crate.status_code, 200)
-        self.assertEqual(snapshot_crate.json["cablingPath"], ["Cable 2", "Cable 1"])
+        self.assertEqual(snapshot_crate.json["cablingPath"], ["Cable 4", "Cable 3"])
 
         # Snapshot from Cable (detSide)
         snapshot_cable_det = self.client.post(
             "/cablingSnapshot",
             json={
-                "starting_point_name": "Cable 1",
+                "starting_point_name": "Cable 3",
                 "starting_side": "detSide",
                 "starting_port": 1,
             },
         )
         self.assertEqual(snapshot_cable_det.status_code, 200)
-        self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 1", "Cable 2"])
+        self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 3", "Cable 4"])
 
         # Snapshot from Cable (crateSide)
         snapshot_cable_crate = self.client.post(
             "/cablingSnapshot",
             json={
-                "starting_point_name": "Cable 2",
+                "starting_point_name": "Cable 4",
                 "starting_side": "crateSide",
                 "starting_port": 1,
             },
         )
         self.assertEqual(snapshot_cable_crate.status_code, 200)
         self.assertEqual(
-            snapshot_cable_crate.json["cablingPath"], ["Cable 2", "Cable 1"]
+            snapshot_cable_crate.json["cablingPath"], ["Cable 4", "Cable 3"]
         )
 
 

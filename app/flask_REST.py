@@ -58,7 +58,6 @@ password = os.environ.get("MONGO_PASSWORD")
 db_name = os.environ.get("MONGO_DB_NAME")
 host_name = os.environ.get("MONGO_HOST_NAME")
 
-print(f"username: {username}, password: {password}")
 client = MongoClient(f"mongodb://{username}:{password}@{host_name}:27017")
 db = client[db_name]
 # we already have a database called "test" from the previous example
