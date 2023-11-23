@@ -365,8 +365,12 @@ class TestAPI(TestCase):
             "connectedTo": module_id,
             "type": "module"
         }
+        # update cables
         cable3_response["detSide"].append(module_conn)
         cable4_response["crateSide"].append(crate_conn)
+        # pop _id
+        cable3_response.pop("_id")
+        cable4_response.pop("_id")
 
         self.client.put(f"/cables/Cable 4", json=cable4_response)
         self.client.put(f"/cables/Cable 3", json=cable3_response)
@@ -399,7 +403,7 @@ class TestAPI(TestCase):
         response = self.client.get("/cables/Cable 3")
         self.assertEqual(response.status_code, 200)
         connection_exists = any(
-            conn["port"] == 1 and conn["connectedTo"] == cable2_id
+            conn["port"] == 1 and conn["connectedTo"] == cable4_id
             for conn in response.json["crateSide"]
         )
         self.assertTrue(connection_exists)
