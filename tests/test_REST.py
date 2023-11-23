@@ -334,10 +334,10 @@ class TestAPI(TestCase):
             self.client.post("/cables", json=cable)
         
         # get the cables ids
-        cable1_response = self.client.get("/cables/Cable 3")
-        cable1_id = cable1_response.json["_id"]
-        cable2_response = self.client.get("/cables/Cable 4")
-        cable2_id = cable2_response.json["_id"]
+        cable1_response = self.client.get("/cables/Cable 3").json
+        cable1_id = cable1_response["_id"]
+        cable2_response = self.client.get("/cables/Cable 4").json
+        cable2_id = cable2_response["_id"]
 
         module = {
             "moduleID": "Module 1",
