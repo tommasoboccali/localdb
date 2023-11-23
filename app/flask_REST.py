@@ -567,11 +567,11 @@ def cabling_snapshot():
         return {"message": "Starting point not found"}, 404
 
     if "connectedTo" in starting_point:  # For modules or crates
-        connected_cable_id = starting_point["connectedTo"]
+        connected_cable_id = ObjectId(starting_point["connectedTo"])
         print(connected_cable_id)
         starting_cable = cables_collection.find_one({"_id": connected_cable_id})
         starting_cable_side = starting_cable[starting_side]
-        starting_port = next((connections["_id"] for connections in starting_cable_side if starting_point["_id"] in connections), None)
+        starting_port = next((connection["port"] for connection in starting_cable_side if starting_point["_id"] in connection), None)
         if not starting_cable:
             return {"message": "Connected cable not found"}, 404
     else:  # For cables
@@ -598,7 +598,7 @@ def cabling_snapshot():
         # Find connected cables and continue traversal. need to get the connection on port next_port
 
         next_cable_id = next((conn['connectedTo'] for conn in next_cable[other_side] if conn['port'] == next_port), None)
-        next_cable = cables_collection.find_one({"_id": next_cable_id})
+        next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
     
     return {"path": path}, 200
 

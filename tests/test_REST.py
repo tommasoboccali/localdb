@@ -351,6 +351,7 @@ class TestAPI(TestCase):
         print(module_insert)
         self.client.post("/crates", json=crate)
 
+        # 
         # 2. Connect the cables
         connect_data = {
             "cable1_name": "Cable 3",
