@@ -725,9 +725,10 @@ def cabling_snapshot():
             ),
             None,
         )
+        previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
 
-    print(next_cable)
+    print(previous_cable[other_side])
 
     return {"cablingPath": path}, 200
 
