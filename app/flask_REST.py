@@ -379,6 +379,7 @@ class CablesResource(Resource):
 
 api.add_resource(CablesResource, "/cables", "/cables/<string:name>")
 
+
 # a route for crates for now equal to cables
 class CratesResource(Resource):
     def get(self, name=None):
@@ -423,11 +424,12 @@ class CratesResource(Resource):
                 return {"message": "Entry not found"}, 404
         else:
             return {"message": "Entry not found"}, 404
-        
-    
+
+
 api.add_resource(CratesResource, "/crates", "/crates/<string:name>")
 
 # Define the schema for validation
+
 
 class CableTemplatesResource(Resource):
     def get(self, cable_type=None):
@@ -456,7 +458,9 @@ class CableTemplatesResource(Resource):
     def put(self, cable_type):
         if cable_type:
             updated_data = request.get_json()
-            cable_templates_collection.update_one({"type": cable_type}, {"$set": updated_data})
+            cable_templates_collection.update_one(
+                {"type": cable_type}, {"$set": updated_data}
+            )
             return {"message": "Template updated"}, 200
         else:
             return {"message": "Template not found"}, 404
@@ -471,27 +475,31 @@ class CableTemplatesResource(Resource):
         else:
             return {"message": "Template not found"}, 404
 
+
 # Add the resource to the API
-api.add_resource(CableTemplatesResource, "/cable_templates", "/cable_templates/<string:cable_type>")
+api.add_resource(
+    CableTemplatesResource, "/cable_templates", "/cable_templates/<string:cable_type>"
+)
 
 ### CUSTOM ROUTES ###
 
+
 @app.route("/disconnectCables", methods=["POST"])
 def disconnect():
-    """        disconnect_data = {
-        cable1_name: name,
-        cable1_port: port,
-        cable1_side: side,
-        cable2_name: name,
-        cable2_port: port
-        }
+    """disconnect_data = {
+    cable1_name: name,
+    cable1_port: port,
+    cable1_side: side,
+    cable2_name: name,
+    cable2_port: port
+    }
     """
     data = request.get_json()
-    cable1_name = data.get('cable1_name')
-    cable1_port = data.get('cable1_port')
-    cable1_side = data.get('cable1_side')
-    cable2_name = data.get('cable2_name')
-    cable2_port = data.get('cable2_port')
+    cable1_name = data.get("cable1_name")
+    cable1_port = data.get("cable1_port")
+    cable1_side = data.get("cable1_side")
+    cable2_name = data.get("cable2_name")
+    cable2_port = data.get("cable2_port")
 
     # Fetch the cables to be connected
     cable1 = cables_collection.find_one({"name": cable1_name})
@@ -503,32 +511,49 @@ def disconnect():
     # Disconnect a cable on the specified side and port
     cables_collection.update_one(
         {"_id": ObjectId(cable1_id)},
-        {"$pull": {cable1_side: {"port": cable1_port, "connectedTo": ObjectId(cable2_id), "type": "cable"}}}
+        {
+            "$pull": {
+                cable1_side: {
+                    "port": cable1_port,
+                    "connectedTo": ObjectId(cable2_id),
+                    "type": "cable",
+                }
+            }
+        },
     )
 
     cable2_side = "detSide" if cable1_side == "crateSide" else "crateSide"
     cables_collection.update_one(
         {"_id": ObjectId(cable2_id)},
-        {"$pull": {cable2_side: {"port": cable2_port, "connectedTo": ObjectId(cable1_id), "type": "cable"}}}
+        {
+            "$pull": {
+                cable2_side: {
+                    "port": cable2_port,
+                    "connectedTo": ObjectId(cable1_id),
+                    "type": "cable",
+                }
+            }
+        },
     )
 
     return {"message": "Cable disconnected"}, 200
 
+
 @app.route("/connectCables", methods=["POST"])
 def connect_cables():
-    """ connect_data = {
-        cable1_name: name,
-        cable1_port: port,
-        cable1_side: side,
-        cable2_name: name,
-        cable2_port: port
+    """connect_data = {
+    cable1_name: name,
+    cable1_port: port,
+    cable1_side: side,
+    cable2_name: name,
+    cable2_port: port
     """
     data = request.get_json()
-    cable1_name = data.get('cable1_name')
-    cable1_port = data.get('cable1_port')
-    cable1_side = data.get('cable1_side')
-    cable2_name = data.get('cable2_name')
-    cable2_port = data.get('cable2_port')
+    cable1_name = data.get("cable1_name")
+    cable1_port = data.get("cable1_port")
+    cable1_side = data.get("cable1_side")
+    cable2_name = data.get("cable2_name")
+    cable2_port = data.get("cable2_port")
 
     # Fetch the cables to be connected
     cable1 = cables_collection.find_one({"name": cable1_name})
@@ -540,18 +565,33 @@ def connect_cables():
     # Update cable1's crateSide to connect to cable2's detSide
     cables_collection.update_one(
         {"_id": ObjectId(cable1_id)},
-        {"$push": {cable1_side: {"port": cable1_port, "connectedTo": ObjectId(cable2_id), "type": "cable"}}}
+        {
+            "$push": {
+                cable1_side: {
+                    "port": cable1_port,
+                    "connectedTo": ObjectId(cable2_id),
+                    "type": "cable",
+                }
+            }
+        },
     )
 
     # Update cable2's detSide to connect to cable1's crateSide
     cable2_side = "detSide" if cable1_side == "crateSide" else "crateSide"
     cables_collection.update_one(
         {"_id": ObjectId(cable2_id)},
-        {"$push": {cable2_side: {"port": cable2_port, "connectedTo": ObjectId(cable1_id), "type": "cable"}}}
+        {
+            "$push": {
+                cable2_side: {
+                    "port": cable2_port,
+                    "connectedTo": ObjectId(cable1_id),
+                    "type": "cable",
+                }
+            }
+        },
     )
 
     return {"message": "Cables connected"}, 200
-
 
 
 @app.route("/addTest", methods=["POST"])
@@ -574,12 +614,15 @@ def addTest():
     except ValidationError as e:
         return {"message": str(e)}, 400
 
+
 # Recursive function to traverse through cables
 def traverse_cables(cable, side, port):
     # Fetch all cable templates
     cable_templates = list(cable_templates_collection.find({}))
     # Determine the next port using the cable template
-    cable_template = next((ct for ct in cable_templates if ct["type"] == cable["type"]), None)
+    cable_template = next(
+        (ct for ct in cable_templates if ct["type"] == cable["type"]), None
+    )
     if not cable_template:
         return [cable["name"]]  # End traversal if no matching template
 
@@ -591,25 +634,36 @@ def traverse_cables(cable, side, port):
     path = [cable["name"]]
     # for next_port in next_ports:
     opposite_side = "detSide" if side == "crateSide" else "crateSide"
-    next_cable_connection = next((conn for conn in cable[opposite_side] if conn["port"] == next_port), None)
+    next_cable_connection = next(
+        (conn for conn in cable[opposite_side] if conn["port"] == next_port), None
+    )
     if next_cable_connection:
-        next_cable = cables_collection.find_one({"_id": next_cable_connection["connectedTo"]})
+        next_cable = cables_collection.find_one(
+            {"_id": next_cable_connection["connectedTo"]}
+        )
         if next_cable:
-            path.extend(traverse_cables(next_cable, opposite_side, next_cable_connection["port"]))
+            path.extend(
+                traverse_cables(
+                    next_cable, opposite_side, next_cable_connection["port"]
+                )
+            )
     return path
-    
+
+
 @app.route("/cablingSnapshot", methods=["POST"])
 def cabling_snapshot():
     data = request.get_json()
-    starting_point_name = data.get('starting_point_name')
-    starting_side = data.get('starting_side')  # 'detSide' or 'crateSide'
+    starting_point_name = data.get("starting_point_name")
+    starting_side = data.get("starting_side")  # 'detSide' or 'crateSide'
     other_side = "crateSide" if starting_side == "detSide" else "detSide"
-    starting_port = data.get('starting_port', 1)  # Default to port 1 if not specified
+    starting_port = data.get("starting_port", 1)  # Default to port 1 if not specified
 
     # Try to find the starting point in modules, crates, or cables
-    starting_point = modules_collection.find_one({"moduleID": starting_point_name}) or \
-                     crates_collection.find_one({"name": starting_point_name}) or \
-                     cables_collection.find_one({"name": starting_point_name})
+    starting_point = (
+        modules_collection.find_one({"moduleID": starting_point_name})
+        or crates_collection.find_one({"name": starting_point_name})
+        or cables_collection.find_one({"name": starting_point_name})
+    )
 
     if not starting_point:
         return {"message": "Starting point not found"}, 404
@@ -619,8 +673,14 @@ def cabling_snapshot():
         starting_cable = cables_collection.find_one({"_id": connected_cable_id})
         print(starting_side)
         print(starting_cable[starting_side])
-        starting_port = next((conn['port'] for conn in starting_cable[starting_side] if ObjectId(conn['connectedTo']) == starting_point["_id"]), None)
-        # starting_port = next((connection["port"] for connection in starting_cable_side if starting_point["_id"] in connection), None)
+        starting_port = next(
+            (
+                conn["port"]
+                for conn in starting_cable[starting_side]
+                if str(conn["connectedTo"]) == str(starting_point["_id"])
+            ),
+            None,
+        )
         print(starting_port)
         if not starting_cable:
             return {"message": "Connected cable not found"}, 404
@@ -635,29 +695,40 @@ def cabling_snapshot():
     while next_cable:
         path.append(next_cable["name"])
         # Determine the next port using the cable template
-        cable_template = next((ct for ct in cable_templates if ct["type"] == next_cable["type"]), None)
+        cable_template = next(
+            (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
+        )
         print(cable_template)
         if starting_side == "detSide":
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
             routing = cable_template["internalRouting"]
-            next_port = next((port for port, connections in routing.items() if next_port in connections), None)
+            next_port = next(
+                (
+                    port
+                    for port, connections in routing.items()
+                    if next_port in connections
+                ),
+                None,
+            )
         print(starting_port, next_port)
         if not next_port:
             break
 
         # Find connected cables and continue traversal. need to get the connection on port next_port
 
-        next_cable_id = next((conn['connectedTo'] for conn in next_cable[other_side] if conn['port'] == next_port), None)
+        next_cable_id = next(
+            (
+                conn["connectedTo"]
+                for conn in next_cable[other_side]
+                if conn["port"] == next_port
+            ),
+            None,
+        )
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
-    
+
     return {"path": path}, 200
 
-
-    
-
-
-        
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005, debug=False)

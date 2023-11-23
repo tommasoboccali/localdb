@@ -393,7 +393,7 @@ class TestAPI(TestCase):
         # 2. Connect the cables
         connect_data = {
             "cable1_name": "Cable 3",
-            "cable1_port": 1,
+            "cable1_port": 2,
             "cable1_side": "crateSide",
             "cable2_name": "Cable 4",
             "cable2_port": 1,
