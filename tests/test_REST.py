@@ -334,18 +334,18 @@ class TestAPI(TestCase):
             self.client.post("/cables", json=cable)
         
         # get the cables ids
-        cable1_response = self.client.get("/cables/Cable 3").json
-        cable1_id = cable1_response["_id"]
-        cable2_response = self.client.get("/cables/Cable 4").json
-        cable2_id = cable2_response["_id"]
+        cable3_response = self.client.get("/cables/Cable 3").json
+        cable3_id = cable3_response["_id"]
+        cable4_response = self.client.get("/cables/Cable 4").json
+        cable4_id = cable4_response["_id"]
 
         module = {
             "moduleID": "Module 1",
             "position": "cleanroom",
             "status": "readyformount",
-            "connectedTo": cable1_id,
+            "connectedTo": cable3_id,
         }
-        crate = {"name": "Crate 1", "connectedTo": cable2_id}
+        crate = {"name": "Crate 1", "connectedTo": cable4_id}
 
 
         module_insert = self.client.post("/modules", json=module)
@@ -365,11 +365,11 @@ class TestAPI(TestCase):
             "connectedTo": module_id,
             "type": "module"
         }
-        cable1_response["detSide"].append(module_conn)
-        cable2_response["crateSide"].append(crate_conn)
+        cable3_response["detSide"].append(module_conn)
+        cable4_response["crateSide"].append(crate_conn)
 
-        self.client.put(f"/cables/Cable 4", json=cable2_response)
-        self.client.put(f"/cables/Cable 3", json=cable1_response)
+        self.client.put(f"/cables/Cable 4", json=cable4_response)
+        self.client.put(f"/cables/Cable 3", json=cable3_response)
         # check that insertions were successful
         response = self.client.get("/cables/Cable 3")
         self.assertEqual(response.status_code, 200)
