@@ -367,6 +367,7 @@ class TestAPI(TestCase):
             conn["port"] == 1 and conn["connectedTo"] == cable2_id
             for conn in response.json["crateSide"]
         )
+        self.assertTrue(connection_exists)
 
         # 3. Perform the three snapshots
         # Snapshot from Module
