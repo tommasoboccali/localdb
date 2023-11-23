@@ -728,6 +728,36 @@ def cabling_snapshot():
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
         if not next_cable:
+            # reached end of cables, append the crate if starting from a module
+            if starting_side == "detSide":
+                next_crate_id = next(
+                    (
+                        conn["connectedTo"]
+                        for conn in previous_cable[other_side]
+                        if conn["port"] == next_port
+                    ),
+                    None,
+                )
+                next_crate = crates_collection.find_one(
+                    {"_id": ObjectId(next_crate_id)}
+                )
+                if next_crate:
+                    path.append(next_crate["name"])
+            # reached end of cables, append the module if starting from a crate
+            else:
+                next_module_id = next(
+                    (
+                        conn["connectedTo"]
+                        for conn in previous_cable[other_side]
+                        if conn["port"] == next_port
+                    ),
+                    None,
+                )
+                next_module = modules_collection.find_one(
+                    {"_id": ObjectId(next_module_id)}
+                )
+                if next_module:
+                    path.append(next_module["moduleID"])
             break
         next_port = next(
             (
