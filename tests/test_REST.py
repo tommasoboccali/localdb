@@ -350,8 +350,6 @@ class TestAPI(TestCase):
         module_insert = self.client.post("/modules", json=module)
         print(module_insert)
         self.client.post("/crates", json=crate)
-        for cable in cables:
-            self.client.post("/cables", json=cable)
 
         # 2. Connect the cables
         connect_data = {
