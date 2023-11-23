@@ -325,17 +325,27 @@ class TestAPI(TestCase):
 
     def test_cabling_snapshot(self):
         # 1. Create module, crate, and cables
-        module = {
-            "moduleID": "Module 1",
-            "position": "cleanroom",
-            "status": "readyformount",
-            "connectedTo": "Cable 1",
-        }
-        crate = {"name": "Crate 1", "connectedTo": "Cable 2"}
         cables = [
             {"name": "Cable 1", "type": "extfib", "detSide": [], "crateSide": []},
             {"name": "Cable 2", "type": "extfib", "detSide": [], "crateSide": []},
         ]
+        for cable in cables:
+            self.client.post("/cables", json=cable)
+        
+        # get the cables ids
+        cable1_response = self.client.get("/cables/Cable 1")
+        cable1_id = cable1_response.json["_id"]
+        cable2_response = self.client.get("/cables/Cable 2")
+        cable2_id = cable2_response.json["_id"]
+
+        module = {
+            "moduleID": "Module 1",
+            "position": "cleanroom",
+            "status": "readyformount",
+            "connectedTo": cable1_id,
+        }
+        crate = {"name": "Crate 1", "connectedTo": cable2_id}
+
 
         module_insert = self.client.post("/modules", json=module)
         print(module_insert)

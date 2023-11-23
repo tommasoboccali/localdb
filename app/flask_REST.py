@@ -556,6 +556,7 @@ def cabling_snapshot():
     data = request.get_json()
     starting_point_name = data.get('starting_point_name')
     starting_side = data.get('starting_side')  # 'detSide' or 'crateSide'
+    other_side = "crateSide" if starting_side == "detSide" else "detSide"
     starting_port = data.get('starting_port', 1)  # Default to port 1 if not specified
 
     # Try to find the starting point in modules, crates, or cables
@@ -567,17 +568,43 @@ def cabling_snapshot():
         return {"message": "Starting point not found"}, 404
 
     if "connectedTo" in starting_point:  # For modules or crates
-        connected_cable_name = starting_point["connectedTo"]
-        starting_cable = cables_collection.find_one({"name": connected_cable_name})
+        connected_cable_id = starting_point["connectedTo"]
+        starting_cable = cables_collection.find_one({"_id": connected_cable_id})
         if not starting_cable:
             return {"message": "Connected cable not found"}, 404
     else:  # For cables
         starting_cable = starting_point
 
-        # Start traversing from the specified starting point
-    cabling_path = traverse_cables(starting_cable, starting_side, starting_port)
+    next_cable = starting_cable
+    next_port = starting_port
+    # Fetch all cable templates
+    cable_templates = list(cable_templates_collection.find({}))
+    path = [starting_point_name]
+    while next_cable:
+        path.append(next_cable["name"])
+        # Determine the next port using the cable template
+        cable_template = next((ct for ct in cable_templates if ct["type"] == next_cable["type"]), None)
+        if starting_side == "detSide":
+            next_port = cable_template["internalRouting"].get(str(next_port), None)
+        else:
+            routing = cable_template["internalRouting"]
+            next_port = next((port for port, connections in routing.items() if next_port in connections), None)
+        
+        if not next_port:
+            break
 
-    return {"cablingPath": cabling_path}, 200
+        # Find connected cables and continue traversal. need to get the connection on port next_port
+
+        next_cable_id = next((conn['connectedTo'] for conn in next_cable[other_side] if conn['port'] == next_port), None)
+        next_cable = cables_collection.find_one({"_id": next_cable_id})
+    
+    return {"path": path}, 200
+
+
+    
+
+
+        
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5005, debug=False)
