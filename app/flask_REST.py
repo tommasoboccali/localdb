@@ -619,11 +619,7 @@ def cabling_snapshot():
         starting_cable = cables_collection.find_one({"_id": connected_cable_id})
         print(starting_side)
         print(starting_cable[starting_side])
-        for conn in starting_cable[starting_side]:
-            print(conn["connectedTo"], type(conn["connectedTo"]))
-            print(starting_point["_id"], type(starting_point["_id"]))
-            
-        starting_port = next((conn['port'] for conn in starting_cable[starting_side] if conn['connectedTo'] == starting_point["_id"]), None)
+        starting_port = next((conn['port'] for conn in starting_cable[starting_side] if ObjectId(conn['connectedTo']) == starting_point["_id"]), None)
         # starting_port = next((connection["port"] for connection in starting_cable_side if starting_point["_id"] in connection), None)
         print(starting_port)
         if not starting_cable:
