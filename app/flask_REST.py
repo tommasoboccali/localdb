@@ -717,7 +717,7 @@ def cabling_snapshot():
 
         # Find connected cables and continue traversal. need to get the connection on port next_port
 
-    next_cable_id = next(
+        next_cable_id = next(
             (
                 conn["connectedTo"]
                 for conn in next_cable[other_side]
@@ -725,7 +725,9 @@ def cabling_snapshot():
             ),
             None,
         )
-    next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
+        next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
+
+    print(next_cable[other_side])
 
     return {"cablingPath": path}, 200
 
