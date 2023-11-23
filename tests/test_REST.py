@@ -365,9 +365,11 @@ class TestAPI(TestCase):
             "connectedTo": module_id,
             "type": "module"
         }
+        cable1_response.append("crateSide", module_conn)
+        cable2_response.append("detSide", crate_conn)
 
-        self.client.put(f"/cables/Cable 4", json=crate_conn)
-        self.client.put(f"/cables/Cable 3", json=module_conn)
+        self.client.put(f"/cables/Cable 4", json=cable2_response)
+        self.client.put(f"/cables/Cable 3", json=cable1_response)
         # check that insertions were successful
         response = self.client.get("/cables/Cable 3")
         self.assertEqual(response.status_code, 200)
