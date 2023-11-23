@@ -671,8 +671,8 @@ def cabling_snapshot():
     if "connectedTo" in starting_point:  # For modules or crates
         connected_cable_id = ObjectId(starting_point["connectedTo"])
         starting_cable = cables_collection.find_one({"_id": connected_cable_id})
-        # print(starting_side)
-        # print(starting_cable[starting_side])
+        print(starting_side)
+        print(starting_cable[starting_side])
         starting_port = next(
             (
                 conn["port"]
@@ -681,7 +681,7 @@ def cabling_snapshot():
             ),
             None,
         )
-        # print(starting_port)
+        print(starting_port)
         if not starting_cable:
             return {"message": "Connected cable not found"}, 404
     else:  # For cables
@@ -698,6 +698,7 @@ def cabling_snapshot():
         cable_template = next(
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
         )
+        print(cable_template)
         if starting_side == "detSide":
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
@@ -710,10 +711,22 @@ def cabling_snapshot():
                 ),
                 None,
             )
-        print(next_cable["name"])
+        print(starting_port, next_port)
         if not next_port:
             break
-    
+
+        # Find connected cables and continue traversal. need to get the connection on port next_port
+
+        next_cable_id = next(
+            (
+                conn["connectedTo"]
+                for conn in next_cable[other_side]
+                if conn["port"] == next_port
+            ),
+            None,
+        )
+        next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
+
     return {"cablingPath": path}, 200
 
 
