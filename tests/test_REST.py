@@ -366,9 +366,24 @@ class TestAPI(TestCase):
             "type": "module"
         }
 
-        self.client.put(f"/cables/Cable 4/crateSide", json=crate_conn)
-        self.client.put(f"/cables/Cable 3/detSide", json=module_conn)
-        # 
+        self.client.put(f"/cables/Cable 4", json=crate_conn)
+        self.client.put(f"/cables/Cable 3", json=module_conn)
+        # check that insertions were successful
+        response = self.client.get("/cables/Cable 3")
+        self.assertEqual(response.status_code, 200)
+        connection_exists = any(
+            conn["port"] == 2 and conn["connectedTo"] == module_id
+            for conn in response.json["detSide"]
+        )
+        self.assertTrue(connection_exists)
+        response = self.client.get("/cables/Cable 4")
+        self.assertEqual(response.status_code, 200)
+        connection_exists = any(
+            conn["port"] == 1 and conn["connectedTo"] == crate_id
+            for conn in response.json["crateSide"]
+        )
+        self.assertTrue(connection_exists)
+        
         # 2. Connect the cables
         connect_data = {
             "cable1_name": "Cable 3",
