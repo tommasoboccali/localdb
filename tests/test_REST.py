@@ -348,7 +348,6 @@ class TestAPI(TestCase):
 
 
         module_insert = self.client.post("/modules", json=module)
-        print(module_insert)
         self.client.post("/crates", json=crate)
 
         # 
@@ -361,6 +360,13 @@ class TestAPI(TestCase):
             "cable2_port": 1,
         }
         self.client.post("/connectCables", json=connect_data)
+        # check if cables are connected correctly
+        response = self.client.get("/cables/Cable 3")
+        self.assertEqual(response.status_code, 200)
+        connection_exists = any(
+            conn["port"] == 1 and conn["connectedTo"] == cable2_id
+            for conn in response.json["crateSide"]
+        )
 
         # 3. Perform the three snapshots
         # Snapshot from Module
