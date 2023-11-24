@@ -689,7 +689,9 @@ def cabling_snapshot():
     cable_templates = list(cable_templates_collection.find({}))
     path = [starting_point_name]
     while next_cable:
-        path.append(next_cable["name"]) if next_cable["name"] != starting_point_name else None
+        path.append(next_cable["name"]) if next_cable[
+            "name"
+        ] != starting_point_name else None
         # Determine the next port using the cable template
         cable_template = next(
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
@@ -697,17 +699,21 @@ def cabling_snapshot():
         if starting_side == "detSide":
             next_port = int(cable_template["internalRouting"].get(str(next_port), None))
         else:
-            next_port = int(next(
-                (
-                    port
-                    for port, connection in cable_template["internalRouting"].items()
-                    if next_port == connection
-                ),
-                None,
-            ))
+            next_port = int(
+                next(
+                    (
+                        port
+                        for port, connection in cable_template[
+                            "internalRouting"
+                        ].items()
+                        if next_port == connection
+                    ),
+                    None,
+                )
+            )
         if not next_port:
             break
-        
+
         next_cable_id = next(
             (
                 conn["connectedTo"]
@@ -719,7 +725,7 @@ def cabling_snapshot():
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
         if not next_cable:
-            # reached end of cables, append the crate if starting from a module
+            # reached end of cables, append the crate if starting from a detSide
             if starting_side == "detSide":
                 next_crate_id = next(
                     (
@@ -734,7 +740,7 @@ def cabling_snapshot():
                 )
                 if next_crate:
                     path.append(next_crate["name"])
-            # reached end of cables, append the module if starting from a crate
+            # reached end of cables, append the module if starting from crateSide
             else:
                 next_module_id = next(
                     (
@@ -750,6 +756,8 @@ def cabling_snapshot():
                 if next_module:
                     path.append(next_module["moduleID"])
             break
+
+        # else continue traversal
         next_port = next(
             (
                 conn["port"]
@@ -760,6 +768,138 @@ def cabling_snapshot():
         )
 
     return {"cablingPath": path}, 200
+
+
+def find_starting_cable(starting_point_name, starting_side):
+    starting_point = (
+        modules_collection.find_one({"moduleID": starting_point_name})
+        or crates_collection.find_one({"name": starting_point_name})
+        or cables_collection.find_one({"name": starting_point_name})
+    )
+
+    if not starting_point:
+        return None, None
+
+    if "connectedTo" in starting_point:
+        connected_cable_id = ObjectId(starting_point["connectedTo"])
+        starting_cable = cables_collection.find_one({"_id": connected_cable_id})
+        if starting_cable:
+            starting_port = next(
+                (conn["port"] for conn in starting_cable[starting_side] if str(conn["connectedTo"]) == str(starting_point["_id"])),
+                None
+            )
+            return starting_cable, starting_port
+    else:
+        return starting_point, 1  # Default port for a cable
+
+    return None, None
+
+def traverse_cables(starting_point_name, starting_cable, starting_side, starting_port, cable_templates):
+    path = []
+    next_cable = starting_cable
+    next_port = starting_port
+    other_side = "crateSide" if starting_side == "detSide" else "detSide"
+
+
+    while next_cable:
+        path.append(next_cable["name"]) if next_cable[
+            "name"
+        ] != starting_point_name else None
+        # Determine the next port using the cable template
+        cable_template = next(
+            (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
+        )
+        if starting_side == "detSide":
+            next_port = int(cable_template["internalRouting"].get(str(next_port), None))
+        else:
+            next_port = int(
+                next(
+                    (
+                        port
+                        for port, connection in cable_template[
+                            "internalRouting"
+                        ].items()
+                        if next_port == connection
+                    ),
+                    None,
+                )
+            )
+        if not next_port:
+            break
+
+        next_cable_id = next(
+            (
+                conn["connectedTo"]
+                for conn in next_cable[other_side]
+                if conn["port"] == next_port
+            ),
+            None,
+        )
+        previous_cable = next_cable
+        next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
+        if not next_cable:
+            # reached end of cables, append the crate if starting from a detSide
+            if starting_side == "detSide":
+                next_crate_id = next(
+                    (
+                        conn["connectedTo"]
+                        for conn in previous_cable[other_side]
+                        if conn["port"] == next_port
+                    ),
+                    None,
+                )
+                next_crate = crates_collection.find_one(
+                    {"_id": ObjectId(next_crate_id)}
+                )
+                if next_crate:
+                    path.append(next_crate["name"])
+            # reached end of cables, append the module if starting from crateSide
+            else:
+                next_module_id = next(
+                    (
+                        conn["connectedTo"]
+                        for conn in previous_cable[other_side]
+                        if conn["port"] == next_port
+                    ),
+                    None,
+                )
+                next_module = modules_collection.find_one(
+                    {"_id": ObjectId(next_module_id)}
+                )
+                if next_module:
+                    path.append(next_module["moduleID"])
+            break
+
+        # else continue traversal
+        next_port = next(
+            (
+                conn["port"]
+                for conn in next_cable[starting_side]
+                if str(conn["connectedTo"]) == str(previous_cable["_id"])
+            ),
+            None,
+        )
+
+    return path
+
+@app.route("/newcablingSnapshot", methods=["POST"])
+def new_cabling_snapshot():
+    data = request.get_json()
+    starting_point_name = data.get("starting_point_name")
+    starting_side = data.get("starting_side")
+    
+    # Fetch all cable templates
+    cable_templates = list(cable_templates_collection.find({}))
+
+    starting_cable, starting_port = find_starting_cable(starting_point_name, starting_side)
+
+    if not starting_cable:
+        return {"message": "Starting point not found"}, 404
+
+    path = traverse_cables(starting_point_name, starting_cable, starting_side, starting_port, cable_templates)
+
+    return {"cablingPath": path}, 200
+
 
 
 if __name__ == "__main__":
