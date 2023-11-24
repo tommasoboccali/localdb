@@ -399,7 +399,6 @@ class CratesResource(Resource):
     def post(self):
         try:
             new_entry = request.get_json()
-            print(new_entry)
             # NOTE: add schema for crates
             crates_collection.insert_one(new_entry)
             return {"message": "Entry inserted"}, 201
@@ -695,7 +694,6 @@ def cabling_snapshot():
         cable_template = next(
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
         )
-        # print(cable_template)
         if starting_side == "detSide":
             next_port = int(cable_template["internalRouting"].get(str(next_port), None))
         else:
