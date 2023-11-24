@@ -682,7 +682,7 @@ def cabling_snapshot():
             ),
             None,
         )
-        print(starting_port)
+        # print(starting_port)
         if not starting_cable:
             return {"message": "Connected cable not found"}, 404
     else:  # For cables
@@ -712,6 +712,7 @@ def cabling_snapshot():
                 ),
                 None,
             )
+            print(next_port)
         # print(starting_port, next_port)
         if not next_port:
             break
@@ -769,7 +770,7 @@ def cabling_snapshot():
             None,
         )
 
-    print(previous_cable)
+    # print(previous_cable)
 
     return {"cablingPath": path}, 200
 

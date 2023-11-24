@@ -429,7 +429,7 @@ class TestAPI(TestCase):
             json={"starting_point_name": "Crate 1", "starting_side": "crateSide"},
         )
         self.assertEqual(snapshot_crate.status_code, 200)
-        self.assertEqual(snapshot_crate.json["cablingPath"], ["Cable 4", "Cable 3"])
+        self.assertEqual(snapshot_crate.json["cablingPath"], ["Crate 1", "Cable 4", "Cable 3", "Module 1"])
 
         # Snapshot from Cable (detSide)
         snapshot_cable_det = self.client.post(
