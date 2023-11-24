@@ -812,6 +812,7 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
         )
         if starting_side == "detSide":
+            print(next_port)
             next_port = int(cable_template["internalRouting"].get(str(next_port), None))
         else:
             next_port = int(
