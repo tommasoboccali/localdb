@@ -795,7 +795,7 @@ def find_starting_cable(starting_point_name, starting_side):
     return None, None
 
 def traverse_cables(starting_point_name, starting_cable, starting_side, starting_port, cable_templates):
-    path = []
+    path = [starting_point_name]
     next_cable = starting_cable
     next_port = starting_port
     other_side = "crateSide" if starting_side == "detSide" else "detSide"
