@@ -713,7 +713,7 @@ def cabling_snapshot():
             ))
         if not next_port:
             break
-
+        print(next_cable)
         # Find connected cables and continue traversal. need to get the connection on port next_port
         for conn in next_cable[other_side]:
             print(type(conn["port"]), conn['port'], next_port)
@@ -731,7 +731,6 @@ def cabling_snapshot():
         )
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
-        print(other_side, next_cable)
         if not next_cable:
             # reached end of cables, append the crate if starting from a module
             if starting_side == "detSide":
