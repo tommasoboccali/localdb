@@ -436,7 +436,7 @@ class TestAPI(TestCase):
             json={
                 "starting_point_name": "Cable 3",
                 "starting_side": "detSide",
-                "starting_port": 1,
+                "starting_port": 2,
             },
         )
         self.assertEqual(snapshot_cable_det.status_code, 200)
