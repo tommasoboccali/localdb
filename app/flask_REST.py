@@ -699,11 +699,14 @@ def cabling_snapshot():
         cable_template = next(
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
         )
-        print(cable_template)
+        # print(cable_template)
         if starting_side == "detSide":
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
             routing = cable_template["internalRouting"]
+            for port, connections in routing.items():
+                print(port, connections)
+                print(next_port)
             next_port = next(
                 (
                     port
@@ -712,7 +715,7 @@ def cabling_snapshot():
                 ),
                 None,
             )
-        print(starting_port, next_port)
+        # print(starting_port, next_port)
         if not next_port:
             break
 
