@@ -793,7 +793,7 @@ def find_starting_cable(starting_point_name, starting_side, starting_port):
             )
             return starting_cable, starting_port
     else:
-        return starting_point  # Default port for a cable
+        return starting_point, starting_port  # Default port for a cable
 
     return None, None
 
