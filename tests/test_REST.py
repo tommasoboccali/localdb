@@ -431,7 +431,7 @@ class TestAPI(TestCase):
 
         # Snapshot from Cable (detSide)
         snapshot_cable_det = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={
                 "starting_point_name": "Cable 3",
                 "starting_side": "detSide",
@@ -443,7 +443,7 @@ class TestAPI(TestCase):
 
         # Snapshot from Cable (crateSide)
         snapshot_cable_crate = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={
                 "starting_point_name": "Cable 4",
                 "starting_side": "crateSide",
