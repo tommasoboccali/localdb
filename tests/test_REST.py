@@ -413,14 +413,14 @@ class TestAPI(TestCase):
 
         # 3. Perform the three snapshots
         # Snapshot from Module
-        # snapshot_module = self.client.post(
-        #     "/cablingSnapshot",
-        #     json={"starting_point_name": "Module 1", "starting_side": "detSide"},
-        # )
-        # print(snapshot_module.json)
-        # print(snapshot_module)
-        # self.assertEqual(snapshot_module.status_code, 200)
-        # self.assertEqual(snapshot_module.json["cablingPath"], ["Module 1", "Cable 3", "Cable 4", "Crate 1"]) 
+        snapshot_module = self.client.post(
+            "/cablingSnapshot",
+            json={"starting_point_name": "Module 1", "starting_side": "detSide"},
+        )
+        print(snapshot_module.json)
+        print(snapshot_module)
+        self.assertEqual(snapshot_module.status_code, 200)
+        self.assertEqual(snapshot_module.json["cablingPath"], ["Module 1", "Cable 3", "Cable 4", "Crate 1"]) 
         # NOTE  up to this point it works
         
         # Snapshot from Crate
