@@ -338,6 +338,7 @@ class TestAPI(TestCase):
         cable3_id = cable3_response["_id"]
         cable4_response = self.client.get("/cables/Cable 4").json
         cable4_id = cable4_response["_id"]
+        print(cable4_id)
 
         module = {
             "moduleID": "Module 1",
