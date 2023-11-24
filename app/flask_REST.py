@@ -773,7 +773,7 @@ def cabling_snapshot():
     return {"cablingPath": path}, 200
 
 
-def find_starting_cable(starting_point_name, starting_side):
+def find_starting_cable(starting_point_name, starting_side, starting_port):
     starting_point = (
         modules_collection.find_one({"moduleID": starting_point_name})
         or crates_collection.find_one({"name": starting_point_name})
@@ -793,7 +793,7 @@ def find_starting_cable(starting_point_name, starting_side):
             )
             return starting_cable, starting_port
     else:
-        return starting_point, 1  # Default port for a cable
+        return starting_point  # Default port for a cable
 
     return None, None
 
@@ -893,11 +893,12 @@ def new_cabling_snapshot():
     data = request.get_json()
     starting_point_name = data.get("starting_point_name")
     starting_side = data.get("starting_side")
+    starting_port = data.get("starting_port", 1)
     
     # Fetch all cable templates
     cable_templates = list(cable_templates_collection.find({}))
 
-    starting_cable, starting_port = find_starting_cable(starting_point_name, starting_side)
+    starting_cable, starting_port = find_starting_cable(starting_point_name, starting_side, starting_port)
 
     if not starting_cable:
         return {"message": "Starting point not found"}, 404
