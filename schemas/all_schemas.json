@@ -1,0 +1,234 @@
+{
+    "logbook": {
+        "type": "object",
+        "properties": {
+            "timestamp": {
+                "type": "string",
+                "format": "date-time"
+            },
+            "event": {
+                "type": "string"
+            },
+            "details": {
+                "type": "string"
+            },
+            "involved_modules": {
+                "type": "array"
+            },
+            "operator": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "timestamp",
+            "operator"
+        ]
+    },
+    "module": {
+        "type": "object",
+        "properties": {
+            "moduleID": {
+                "type": "string"
+            },
+            "position": {
+                "type": "string"
+            },
+            "notes": {
+                "type": "object"
+            },
+            "ref_to_global_logbook": {
+                "type": "array"
+            },
+            "status": {
+                "type": "string"
+            },
+            "overall_grade": {
+                "type": "string"
+            },
+            "tests": {
+                "type": "array"
+            },
+            "connectedTo": {
+                "bsonType": "objectId"
+            }
+        },
+        "required": [
+            "moduleID",
+            "position",
+            "status"
+        ]
+    },
+    "cables": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Human-readable name for the cable"
+            },
+            "type": {
+                "type": "string",
+                "description": "Type of cable, e.g., '12-to-1'"
+            },
+            "detSide": {
+                "type": "array",
+                "description": "List of connections on the detector side",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "integer"
+                        },
+                        "connectedTo": {
+                            "bsonType": "objectId",
+                            "description": "Reference to the connected module or cable"
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Type of entity this port is connected to, e.g., 'module', 'cable'"
+                        }
+                    },
+                    "required": [
+                        "port",
+                        "connectedTo",
+                        "type"
+                    ]
+                }
+            },
+            "crateSide": {
+                "type": "array",
+                "description": "List of connections on the crate side",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "integer"
+                        },
+                        "connectedTo": {
+                            "bsonType": "objectId",
+                            "description": "Reference to the connected crate or cable"
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Type of entity this port is connected to, e.g., 'crate', 'cable'"
+                        }
+                    },
+                    "required": [
+                        "port",
+                        "connectedTo",
+                        "type"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "type",
+            "detSide",
+            "crateSide"
+        ]
+    },
+    "cable_templates": {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string",
+                "description": "Type of cable, e.g., '12-to-1'"
+            },
+            "internalRouting": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": ["integer", "array"]
+                },
+                "description": "Mapping of input ports to output ports"
+            }
+        },
+        "required": [
+            "type",
+            "internalRouting"
+        ]
+    },
+    "CurrentCablingMap": {
+        "type": "object",
+        "properties": {
+            "ID": {
+                "type": "string"
+            },
+            "detSide": {
+                "type": "array",
+                "items": {
+                    "type": "object"
+                }
+            },
+            "crateSide": {
+                "type": "array"
+            },
+            "Type": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "ID",
+            "detSide",
+            "crateSide",
+            "Type"
+        ]
+    },
+    "tests": {
+        "type": "object",
+        "properties": {
+            "testID": {
+                "type": "string"
+            },
+            "modules_list": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "testType": {
+                "type": "string"
+            },
+            "testDate": {
+                "type": "string"
+            },
+            "testOperator": {
+                "type": "string"
+            },
+            "testStatus": {
+                "type": "string"
+            },
+            "testResults": {
+                "type": "object"
+            }
+        },
+        "required": [
+            "testID",
+            "testType",
+            "modules_list",
+            "testDate",
+            "testStatus",
+            "testResults"
+        ]
+    },
+    "ConnectionSnapshot": {
+        "type": "object",
+        "properties": {
+            "First": {
+                "type": "string"
+            },
+            "Last": {
+                "type": "string"
+            },
+            "Chain": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
+        "required": [
+            "First",
+            "Last",
+            "Chain"
+        ]
+    }
+}
