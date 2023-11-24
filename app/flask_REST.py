@@ -671,9 +671,9 @@ def cabling_snapshot():
     if "connectedTo" in starting_point:  # For modules or crates
         connected_cable_id = ObjectId(starting_point["connectedTo"])
         starting_cable = cables_collection.find_one({"_id": connected_cable_id})
-        print(starting_point)
-        print(starting_side)
-        print(starting_cable[starting_side])
+        # print(starting_point)
+        # print(starting_side)
+        # print(starting_cable[starting_side])
         starting_port = next(
             (
                 conn["port"]
