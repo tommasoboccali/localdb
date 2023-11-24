@@ -830,6 +830,7 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
             (
                 conn["connectedTo"]
                 for conn in next_cable[other_side]
+                print(conn["port"], type(conn["port"]), next_port, type(next_port))
                 if conn["port"] == next_port
             ),
             None,
