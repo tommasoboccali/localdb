@@ -701,7 +701,7 @@ def cabling_snapshot():
         )
         # print(cable_template)
         if starting_side == "detSide":
-            next_port = cable_template["internalRouting"].get(str(next_port), None)
+            next_port = cable_template["internalRouting"].get(int(next_port), None)
         else:
             next_port = int(next(
                 (
