@@ -720,6 +720,7 @@ def cabling_snapshot():
         for conn in next_cable[other_side]:
             if conn["port"] == next_port:
                 print(conn["connectedTo"])
+            else: print("no connection")
         
         next_cable_id = next(
             (
@@ -729,7 +730,7 @@ def cabling_snapshot():
             ),
             None,
         )
-        print(next_cable_id)
+        # print(next_cable_id)
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
         print(other_side, next_cable)
