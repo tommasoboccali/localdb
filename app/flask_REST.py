@@ -694,7 +694,7 @@ def cabling_snapshot():
     cable_templates = list(cable_templates_collection.find({}))
     path = [starting_point_name]
     while next_cable:
-        path.append(next_cable["name"])
+        path.append(next_cable["name"]) if next_cable["name"] != starting_point_name else None
         # Determine the next port using the cable template
         cable_template = next(
             (ct for ct in cable_templates if ct["type"] == next_cable["type"]), None
@@ -711,11 +711,9 @@ def cabling_snapshot():
                 ),
                 None,
             ))
-        # print(starting_port, next_port)
         if not next_port:
             break
 
-        print(other_side, next_cable[other_side])
         # Find connected cables and continue traversal. need to get the connection on port next_port
         for conn in next_cable[other_side]:
             print(type(conn["port"]), conn['port'], next_port)
@@ -731,7 +729,6 @@ def cabling_snapshot():
             ),
             None,
         )
-        # print(next_cable_id)
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
         print(other_side, next_cable)
