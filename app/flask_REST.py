@@ -774,6 +774,17 @@ def traverse_cables(cable, side, port):
 
 
 def find_starting_cable(starting_point_name, starting_side, starting_port):
+    """
+    Find the starting cable and port based on the given starting point name, side, and port.
+
+    Args:
+        starting_point_name (str): The name of the starting point (either a module, crate, or cable).
+        starting_side (str): The side of the starting cable to search for the port.
+        starting_port (str): The starting port to find.
+
+    Returns:
+        tuple: A tuple containing the starting cable and port. If the starting point is not found, returns (None, None).
+    """
     starting_point = (
         modules_collection.find_one({"moduleID": starting_point_name})
         or crates_collection.find_one({"name": starting_point_name})
@@ -798,6 +809,20 @@ def find_starting_cable(starting_point_name, starting_side, starting_port):
     return None, None
 
 def traverse_cables(starting_point_name, starting_cable, starting_side, starting_port, cable_templates):
+    """
+    Traverses through a network of cables starting from a given point and returns the path.
+
+    Args:
+        starting_point_name (str): The name of the starting point.
+        starting_cable (dict): The starting cable.
+        starting_side (str): The starting side ("detSide" or "crateSide").
+        starting_port (int): The starting port.
+        cable_templates (list): A list of cable templates.
+
+    Returns:
+        list: The path of cables and connected components.
+
+    """
     path = [starting_point_name]
     next_cable = starting_cable
     next_port = starting_port
@@ -886,6 +911,20 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
 
 @app.route("/cablingSnapshot", methods=["POST"])
 def new_cabling_snapshot():
+    """
+    Endpoint for creating a new cabling snapshot.
+
+    Parameters:
+    - starting_point_name (str): The name of the starting point.
+    - starting_side (str): The side of the starting point.
+    - starting_port (int, optional): The starting port number (default is 1).
+
+    Returns:
+    - dict: A dictionary containing the cabling path.
+
+    Raises:
+    - 404: If the starting point is not found.
+    """
     data = request.get_json()
     starting_point_name = data.get("starting_point_name")
     starting_side = data.get("starting_side")
