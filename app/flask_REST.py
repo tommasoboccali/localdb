@@ -717,7 +717,11 @@ def cabling_snapshot():
             break
 
         # Find connected cables and continue traversal. need to get the connection on port next_port
-
+        for conn in next_cable[other_side]:
+            if conn["port"] == next_port:
+                next_cable_id = conn["connectedTo"]
+        
+        print(next_cable_id)
         next_cable_id = next(
             (
                 conn["connectedTo"]
