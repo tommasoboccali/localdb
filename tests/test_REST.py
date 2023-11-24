@@ -368,6 +368,8 @@ class TestAPI(TestCase):
         cable3_response["detSide"].append(module_conn)
         cable4_response["crateSide"].append(crate_conn)
         print(cable4_response)
+        assert cable4_id == cable4_response["_id"]
+
         # pop _id
         cable3_response.pop("_id")
         cable4_response.pop("_id")
