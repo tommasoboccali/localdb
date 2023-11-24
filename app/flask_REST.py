@@ -704,14 +704,11 @@ def cabling_snapshot():
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
             routing = cable_template["internalRouting"]
-            for port, connections in routing.items():
-                print(port, connections)
-                print(next_port)
             next_port = next(
                 (
                     port
-                    for port, connections in routing.items()
-                    if next_port in connections
+                    for port, connection in routing.items()
+                    if next_port == connection
                 ),
                 None,
             )
