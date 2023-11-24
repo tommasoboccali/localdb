@@ -440,7 +440,7 @@ class TestAPI(TestCase):
             },
         )
         self.assertEqual(snapshot_cable_det.status_code, 200)
-        self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 3", "Cable 4"])
+        self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 3", "Cable 4", "Crate 1"])
 
         # Snapshot from Cable (crateSide)
         snapshot_cable_crate = self.client.post(
@@ -453,7 +453,7 @@ class TestAPI(TestCase):
         )
         self.assertEqual(snapshot_cable_crate.status_code, 200)
         self.assertEqual(
-            snapshot_cable_crate.json["cablingPath"], ["Cable 4", "Cable 3"]
+            snapshot_cable_crate.json["cablingPath"], ["Cable 4", "Cable 3", "Module 1"]
         )
 
 
