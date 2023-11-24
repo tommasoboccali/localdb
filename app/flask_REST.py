@@ -721,7 +721,7 @@ def cabling_snapshot():
 
         for conn in next_cable[other_side]:
             print(conn)
-            
+
         next_cable_id = next(
             (
                 conn["connectedTo"]
@@ -730,6 +730,7 @@ def cabling_snapshot():
             ),
             None,
         )
+        print(next_cable_id)
         previous_cable = next_cable
         next_cable = cables_collection.find_one({"_id": ObjectId(next_cable_id)})
         print(other_side, next_cable)
