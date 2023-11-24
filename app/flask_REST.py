@@ -703,11 +703,10 @@ def cabling_snapshot():
         if starting_side == "detSide":
             next_port = cable_template["internalRouting"].get(str(next_port), None)
         else:
-            routing = cable_template["internalRouting"]
             next_port = next(
                 (
                     port
-                    for port, connection in routing.items()
+                    for port, connection in cable_template["internalRouting"].items()
                     if next_port == connection
                 ),
                 None,
@@ -718,8 +717,6 @@ def cabling_snapshot():
             break
 
         # Find connected cables and continue traversal. need to get the connection on port next_port
-
-        print(next_cable[other_side])
 
         next_cable_id = next(
             (
