@@ -826,11 +826,13 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
         if not next_port:
             break
         print(next_cable[other_side])
+        for conn in next_cable[other_side]:
+            print(conn["port"], type(conn["port"]), next_port, type(next_port))
+
         next_cable_id = next(
             (
                 conn["connectedTo"]
                 for conn in next_cable[other_side]
-                print(conn["port"], type(conn["port"]), next_port, type(next_port))
                 if conn["port"] == next_port
             ),
             None,
