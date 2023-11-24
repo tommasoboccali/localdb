@@ -800,7 +800,6 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
     next_port = starting_port
     other_side = "crateSide" if starting_side == "detSide" else "detSide"
 
-
     while next_cable:
         path.append(next_cable["name"]) if next_cable[
             "name"
