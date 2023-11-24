@@ -1,5 +1,5 @@
-.env
-.session.cache
+*.env
+*.session.cache
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
