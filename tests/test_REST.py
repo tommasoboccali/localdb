@@ -413,7 +413,7 @@ class TestAPI(TestCase):
         # 3. Perform the three snapshots
         # Snapshot from Module
         snapshot_module = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={"starting_point_name": "Module 1", "starting_side": "detSide"},
         )
 
@@ -422,7 +422,7 @@ class TestAPI(TestCase):
         
         # Snapshot from Crate
         snapshot_crate = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={"starting_point_name": "Crate 1", "starting_side": "crateSide"},
         )
         self.assertEqual(snapshot_crate.status_code, 200)
@@ -430,7 +430,7 @@ class TestAPI(TestCase):
 
         # Snapshot from Cable (detSide)
         snapshot_cable_det = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={
                 "starting_point_name": "Cable 3",
                 "starting_side": "detSide",
@@ -442,7 +442,7 @@ class TestAPI(TestCase):
 
         # Snapshot from Cable (crateSide)
         snapshot_cable_crate = self.client.post(
-            "/newcablingSnapshot",
+            "/cablingSnapshot",
             json={
                 "starting_point_name": "Cable 4",
                 "starting_side": "crateSide",
