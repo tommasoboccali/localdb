@@ -799,7 +799,6 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
     next_cable = starting_cable
     next_port = starting_port
     other_side = "crateSide" if starting_side == "detSide" else "detSide"
-    print(starting_point_name, starting_cable, starting_side, starting_port)
 
     while next_cable:
         path.append(next_cable["name"]) if next_cable[
@@ -826,7 +825,7 @@ def traverse_cables(starting_point_name, starting_cable, starting_side, starting
             )
         if not next_port:
             break
-
+        print(next_cable[other_side])
         next_cable_id = next(
             (
                 conn["connectedTo"]
