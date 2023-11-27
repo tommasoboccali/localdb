@@ -23,7 +23,7 @@ def regExpPatterns(s):
         return None
 
 def findModuleIds(istring):
-    return re.findall(regExpPatterns["ModuleID"],istring)
+    return re.findall(regExpPatterns("ModuleID"),istring)
 
 class CustomJSONEncoder(JSONEncoder):
     """
@@ -230,7 +230,22 @@ class LogbookResource(Resource):
         """
         try:
             new_log = request.get_json()
+            
             validate(instance=new_log, schema=logbook_schema)
+#
+# check involved modules
+#
+            im = []
+            key = "involved_modules"
+            det = "details"
+            d = ""
+            modules_in_the_details = []
+            if key in  new_log:
+                im = new_log["involved_modules"]
+            if det in new_log:
+                d = new_log["details"]
+                modules_in_the_details = findModuleIds(d) 
+            new_log[key] = im + list(set(modules_in_the_details) - set(im))
             logbook_collection.insert_one(new_log)
             return {"message": "Log inserted"}, 201
         except ValidationError as e:

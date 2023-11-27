@@ -476,23 +476,30 @@ class TestAPI(TestCase):
         self.assertEqual(len(logbook_entries.json),1)
 
 
-#    def test_insert_log(self):
-#        new_log = {
-#            "timestamp": "2023-10-03T14:21:29Z",
-#            "event": "Module added",
-#            "operator": "John Doe",
-#            "station": "pccmslab1",
-#            "involved_modules": ['PS_1','PS_2'],
-#            "sessionid": "TESTSESSION1",
-#            "details": " I tried to insert PS_88 and PS_44."
-#        }
-#        response = self.client.post("/logbook", json=new_log)
-#        self.assertEqual(response.status_code, 201)
-#        self.assertEqual(response.json, {"message": "Log inserted"})
-#
+    def test_insert_log(self):
+        new_log = {
+            "timestamp": "2023-10-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+            "station": "pccmslab1",
+            "involved_modules": ['PS_1','PS_2'],
+            "sessionid": "TESTSESSION1",
+            "details": " I tried to insert PS_88 and PS_44. and also PS_1."
+        }
+        response = self.client.post("/logbook", json=new_log)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {"message": "Log inserted"})
+
 #
 # now I try to get it back, and I check the involved_modules
 #
+        new_log  = {
+            "timestamp": "2023-10-03T14:21:29Z",
+        }    
+        response = self.client.get("/logbook/2023-10-03T14:21:29Z")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json["involved_modules"]),4)
+#################
 
 if __name__ == "__main__":
     unittest.main()
