@@ -476,7 +476,7 @@ class TestAPI(TestCase):
         self.assertEqual(len(logbook_entries.json),1)
 
 
-    def test_insert_log(self):
+    def test_insert_log_2(self):
         new_log = {
             "timestamp": "2023-10-03T14:21:29Z",
             "event": "Module added",
