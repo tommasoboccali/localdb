@@ -70,6 +70,8 @@ class TestAPI(TestCase):
             "timestamp": "2023-11-03T14:21:29Z",
             "event": "Module added",
             "operator": "John Doe",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION1"
         }
         response = self.client.post("/logbook", json=new_log)
         self.assertEqual(response.status_code, 201)
@@ -89,6 +91,8 @@ class TestAPI(TestCase):
             "timestamp": "2023-11-03T14:21:29Z",
             "event": "Module added",
             "operator": "John Doe",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION1"
         }
         self.client.post("/logbook", json=new_log)
 
