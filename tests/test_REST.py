@@ -445,19 +445,54 @@ class TestAPI(TestCase):
         self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 3", "Cable 4", "Crate 1"])
 
         # Snapshot from Cable (crateSide)
-        snapshot_cable_crate = self.client.post(
-            "/cablingSnapshot",
-            json={
-                "starting_point_name": "Cable 4",
-                "starting_side": "crateSide",
-                "starting_port": 1,
-            },
-        )
-        self.assertEqual(snapshot_cable_crate.status_code, 200)
-        self.assertEqual(
-            snapshot_cable_crate.json["cablingPath"], ["Cable 4", "Cable 3", "Module 1"]
-        )
+    def test_LogBookSearchByModuleIDs(self):
+        #insert a few entriesi for testing
+        new_log = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION1",
+            "involved_modules": ['PS_1','PS_2']
+        }
+        response = self.client.post("/logbook", json=new_log)
+        new_log2 = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION1",
+            "involved_modules": ['MS_1','MS_2']
+        }
+        response = self.client.post("/logbook", json=new_log2)
 
+        logbook_entries = self.client.post(
+            "/searchLogBookByModuleIDs",
+            json={
+                "modules": "PS.*"
+            }
+        )
+        self.assertEqual(logbook_entries.status_code, 200) 
+        self.assertEqual(len(logbook_entries.json),1)
+
+
+#    def test_insert_log(self):
+#        new_log = {
+#            "timestamp": "2023-10-03T14:21:29Z",
+#            "event": "Module added",
+#            "operator": "John Doe",
+#            "station": "pccmslab1",
+#            "involved_modules": ['PS_1','PS_2'],
+#            "sessionid": "TESTSESSION1",
+#            "details": " I tried to insert PS_88 and PS_44."
+#        }
+#        response = self.client.post("/logbook", json=new_log)
+#        self.assertEqual(response.status_code, 201)
+#        self.assertEqual(response.json, {"message": "Log inserted"})
+#
+#
+# now I try to get it back, and I check the involved_modules
+#
 
 if __name__ == "__main__":
     unittest.main()

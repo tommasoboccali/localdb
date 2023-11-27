@@ -9,7 +9,21 @@ import os
 import json
 from dotenv import load_dotenv
 from flask.json.provider import JSONProvider
+import re
+from bson import json_util
 
+
+# define regexps to select module ids, crateid, etc
+
+def regExpPatterns(s):
+    mapRE = {"ModuleID": "PS_\\d+"}
+    if s in mapRE.keys():
+        return  mapRE[s]
+    else:
+        return None
+
+def findModuleIds(istring):
+    return re.findall(regExpPatterns["ModuleID"],istring)
 
 class CustomJSONEncoder(JSONEncoder):
     """
@@ -482,7 +496,17 @@ api.add_resource(
 
 ### CUSTOM ROUTES ###
 
-
+@app.route("/searchLogBookByModuleIDs", methods=["POST"])
+def SearchLogBookByModuleIDs():
+        data = request.get_json()
+        pattern = data.get("modules")
+        rexp = re.compile(pattern, re.IGNORECASE)
+        logs =logbook_collection.find({"involved_modules": rexp})     
+#        logs =logbook_collection.find({"involved_modules": ""})
+        result = []
+        for i in logs:
+           result.append(str(i["_id"])) 
+        return jsonify(result), 200        
 @app.route("/disconnectCables", methods=["POST"])
 def disconnect():
     """disconnect_data = {
