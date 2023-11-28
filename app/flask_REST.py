@@ -9,7 +9,21 @@ import os
 import json
 from dotenv import load_dotenv
 from flask.json.provider import JSONProvider
+import re
+from bson import json_util
 
+
+# define regexps to select module ids, crateid, etc
+
+def regExpPatterns(s):
+    mapRE = {"ModuleID": "PS_\\d+"}
+    if s in mapRE.keys():
+        return  mapRE[s]
+    else:
+        return None
+
+def findModuleIds(istring):
+    return re.findall(regExpPatterns("ModuleID"),istring)
 
 class CustomJSONEncoder(JSONEncoder):
     """
@@ -216,7 +230,22 @@ class LogbookResource(Resource):
         """
         try:
             new_log = request.get_json()
+            
             validate(instance=new_log, schema=logbook_schema)
+#
+# check involved modules
+#
+            im = []
+            key = "involved_modules"
+            det = "details"
+            d = ""
+            modules_in_the_details = []
+            if key in  new_log:
+                im = new_log["involved_modules"]
+            if det in new_log:
+                d = new_log["details"]
+                modules_in_the_details = findModuleIds(d) 
+            new_log[key] = im + list(set(modules_in_the_details) - set(im))
             logbook_collection.insert_one(new_log)
             return {"message": "Log inserted"}, 201
         except ValidationError as e:
@@ -481,7 +510,34 @@ api.add_resource(
 )
 
 ### CUSTOM ROUTES ###
+@app.route("/searchLogBookByText", methods=["POST"])
+def SearchLogBookByText():
+        data = request.get_json()
+        pattern = data.get("modules")
+        rexp = re.compile(pattern, re.IGNORECASE)
+        logs =logbook_collection.find({"event": rexp})
+        logs1 = logbook_collection.find({"details": rexp})
+        result = set()
+        for i in logs:
+           result.add(str(i["_id"])) 
+        for i in logs1:
+            result.add(str(i["_id"]))
+        results = list(result)
+        return jsonify(results), 200        
 
+    
+
+@app.route("/searchLogBookByModuleIDs", methods=["POST"])
+def SearchLogBookByModuleIDs():
+        data = request.get_json()
+        pattern = data.get("modules")
+        rexp = re.compile(pattern, re.IGNORECASE)
+        logs =logbook_collection.find({"involved_modules": rexp})     
+#        logs =logbook_collection.find({"involved_modules": ""})
+        result = []
+        for i in logs:
+           result.append(str(i["_id"])) 
+        return jsonify(result), 200        
 
 @app.route("/disconnectCables", methods=["POST"])
 def disconnect():

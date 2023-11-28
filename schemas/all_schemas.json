@@ -2,6 +2,12 @@
     "logbook": {
         "type": "object",
         "properties": {
+            "sessionid": {
+                "type": "string"
+            }, 		    
+	    "station":{
+	        "type": "string"	
+	    },
             "timestamp": {
                 "type": "string",
                 "format": "date-time"
@@ -21,7 +27,10 @@
         },
         "required": [
             "timestamp",
-            "operator"
+            "operator",
+	    "sessionid",
+	    "station",
+	    "event"
         ]
     },
     "module": {
