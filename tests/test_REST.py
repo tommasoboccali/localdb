@@ -445,6 +445,40 @@ class TestAPI(TestCase):
         self.assertEqual(snapshot_cable_det.json["cablingPath"], ["Cable 3", "Cable 4", "Crate 1"])
 
         # Snapshot from Cable (crateSide)
+    def test_LogBookSearchByText(self):
+        new_log = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Doe",
+            "event": "pippo",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION1",
+            "involved_modules": ['PS_1','PS_2']
+        }
+        response = self.client.post("/logbook", json=new_log)
+        new_log2 = {
+            "timestamp": "2023-11-03T14:21:29Z",
+            "event": "Module added",
+            "operator": "John Do2",
+            "details": "pippo",
+            "station": "pccmslab1",
+            "sessionid": "TESTSESSION2",
+            "involved_modules": ['MS_1','MS_2']
+        }
+        response = self.client.post("/logbook", json=new_log2)
+
+        logbook_entries = self.client.post(
+            "/searchLogBookByText",
+            json={
+                "modules": "pi.*o"
+            }
+        )
+        self.assertEqual(logbook_entries.status_code, 200) 
+        self.assertEqual(len(logbook_entries.json),2)
+
+
+
+
     def test_LogBookSearchByModuleIDs(self):
         #insert a few entriesi for testing
         new_log = {
