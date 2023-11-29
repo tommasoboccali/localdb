@@ -188,7 +188,7 @@ class LogbookResource(Resource):
         Deletes an existing logbook entry with the specified timestamp.
     """
 
-    def get(self, timestamp=None):
+    def get(self, _id=None):
         """
         Retrieves a logbook entry with the specified timestamp, or all logbook entries if no timestamp is provided.
 
@@ -202,8 +202,8 @@ class LogbookResource(Resource):
         dict or list
             A dictionary representing the logbook entry with the specified timestamp, or a list of all logbook entries if no timestamp is provided.
         """
-        if timestamp:
-            log = logbook_collection.find_one({"timestamp": timestamp})
+        if _id:
+            log = logbook_collection.find_one({"_id": ObjectId(_id)})
             if log:
                 log["_id"] = str(log["_id"])  # convert ObjectId to string
                 return jsonify(log)
@@ -247,11 +247,11 @@ class LogbookResource(Resource):
                 modules_in_the_details = findModuleIds(d) 
             new_log[key] = im + list(set(modules_in_the_details) - set(im))
             logbook_collection.insert_one(new_log)
-            return {"message": "Log inserted"}, 201
+            return {"_id": str(new_log["_id"])}, 201
         except ValidationError as e:
             return {"message": str(e)}, 400
 
-    def put(self, timestamp):
+    def put(self, _id):
         """
         Updates an existing logbook entry with the specified timestamp.
 
@@ -266,10 +266,10 @@ class LogbookResource(Resource):
             A dictionary containing a message indicating that the logbook entry was successfully updated.
         """
         updated_data = request.get_json()
-        logbook_collection.update_one({"timestamp": timestamp}, {"$set": updated_data})
+        logbook_collection.update_one({"_id": _id}, {"$set": updated_data})
         return {"message": "Log updated"}, 200
 
-    def delete(self, timestamp):
+    def delete(self, _id):
         """
         Deletes an existing logbook entry with the specified timestamp.
 
@@ -283,16 +283,16 @@ class LogbookResource(Resource):
         dict
             A dictionary containing a message indicating that the logbook entry was successfully deleted.
         """
-        log = logbook_collection.find_one({"timestamp": timestamp})
+        log = logbook_collection.find_one({"_id": ObjectId(_id)})
         if log:
-            logbook_collection.delete_one({"timestamp": timestamp})
+            logbook_collection.delete_one({"_id": ObjectId(_id)})
             return {"message": "Log deleted"}, 200
         else:
             return {"message": "Log not found"}, 404
 
 
 # API Routes
-api.add_resource(LogbookResource, "/logbook", "/logbook/<string:timestamp>")
+api.add_resource(LogbookResource, "/logbook", "/logbook/<string:_id>")
 
 
 class TestsResource(Resource):
@@ -523,7 +523,7 @@ def SearchLogBookByText():
         for i in logs1:
             result.add(str(i["_id"]))
         results = list(result)
-        return jsonify(results), 200        
+        return  jsonify(results), 200        
 
     
 

@@ -75,14 +75,13 @@ class TestAPI(TestCase):
         }
         response = self.client.post("/logbook", json=new_log)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json, {"message": "Log inserted"})
 
     def test_fetch_log_not_found(self):
-        response = self.client.get("/logbook/2023-11-03T15:00:00Z")
+        response = self.client.get("/logbook/123456789012123456789012")
         self.assertEqual(response.status_code, 404)
 
     def test_delete_log_not_found(self):
-        response = self.client.delete("/logbook/2023-11-03T15:00:00Z")
+        response = self.client.delete("/logbook/123456789012123456789012")
         self.assertEqual(response.status_code, 404)
 
     def test_delete_log(self):
@@ -94,10 +93,9 @@ class TestAPI(TestCase):
             "station": "pccmslab1",
             "sessionid": "TESTSESSION1"
         }
-        self.client.post("/logbook", json=new_log)
-
+        _id = ((self.client.post("/logbook", json=new_log)).json)["_id"]
         # Now, let's delete it
-        response = self.client.delete("/logbook/2023-11-03T14:21:29Z")
+        response = self.client.delete("/logbook/"+str(_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Log deleted"})
 
@@ -522,15 +520,12 @@ class TestAPI(TestCase):
         }
         response = self.client.post("/logbook", json=new_log)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json, {"message": "Log inserted"})
 
 #
 # now I try to get it back, and I check the involved_modules
 #
-        new_log  = {
-            "timestamp": "2023-10-03T14:21:29Z",
-        }    
-        response = self.client.get("/logbook/2023-10-03T14:21:29Z")
+        _id = str((response.json)["_id"])
+        response = self.client.get("/logbook/"+_id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json["involved_modules"]),4)
 #################
