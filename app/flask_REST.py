@@ -175,32 +175,32 @@ class LogbookResource(Resource):
 
     Methods:
     --------
-    get(timestamp=None):
-        Retrieves a logbook entry with the specified timestamp, or all logbook entries if no timestamp is provided.
+    get(_id=None):
+        Retrieves a logbook entry with the specified _id, or all logbook entries if no _id is provided.
 
     post():
         Inserts a new logbook entry into the database.
 
-    put(timestamp):
-        Updates an existing logbook entry with the specified timestamp.
+    put(_id):
+        Updates an existing logbook entry with the specified _id.
 
-    delete(timestamp):
-        Deletes an existing logbook entry with the specified timestamp.
+    delete(_id):
+        Deletes an existing logbook entry with the specified _is.
     """
 
     def get(self, _id=None):
         """
-        Retrieves a logbook entry with the specified timestamp, or all logbook entries if no timestamp is provided.
+        Retrieves a logbook entry with the specified _id, or all logbook entries if no _id is provided.
 
         Parameters:
         -----------
         timestamp : str, optional
-            The timestamp of the logbook entry to retrieve.
+            The _id of the logbook entry to retrieve.
 
         Returns:
         --------
         dict or list
-            A dictionary representing the logbook entry with the specified timestamp, or a list of all logbook entries if no timestamp is provided.
+            A dictionary representing the logbook entry with the specified _id, or a list of all logbook entries if no timestamp is provided.
         """
         if _id:
             log = logbook_collection.find_one({"_id": ObjectId(_id)})
@@ -226,7 +226,7 @@ class LogbookResource(Resource):
         Returns:
         --------
         dict
-            A dictionary containing a message indicating that the logbook entry was successfully inserted.
+            A dictionary containing the _id of the new entry
         """
         try:
             new_log = request.get_json()
@@ -253,12 +253,12 @@ class LogbookResource(Resource):
 
     def put(self, _id):
         """
-        Updates an existing logbook entry with the specified timestamp.
+        Updates an existing logbook entry with the specified _id (as a string).
 
         Parameters:
         -----------
         timestamp : str
-            The timestamp of the logbook entry to update.
+            The _id of the logbook entry to update.
 
         Returns:
         --------
@@ -266,7 +266,7 @@ class LogbookResource(Resource):
             A dictionary containing a message indicating that the logbook entry was successfully updated.
         """
         updated_data = request.get_json()
-        logbook_collection.update_one({"_id": _id}, {"$set": updated_data})
+        logbook_collection.update_one({"_id": ObjectId(_id)}, {"$set": updated_data})
         return {"message": "Log updated"}, 200
 
     def delete(self, _id):
@@ -276,7 +276,7 @@ class LogbookResource(Resource):
         Parameters:
         -----------
         timestamp : str
-            The timestamp of the logbook entry to delete.
+            The _id of the logbook entry to delete.
 
         Returns:
         --------
