@@ -201,6 +201,12 @@
                 "items": {
                     "type": "string"
                 }
+            },
+            "URLs": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
             }
         },
         "required": [
