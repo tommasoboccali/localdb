@@ -23,6 +23,7 @@ class TestAPI(TestCase):
         db.logbook.drop()
         db.current_cabling_map.drop()
         db.tests.drop()
+        db.testpayloads.drop()
         db.cables.drop()
         db.cables_templates.drop()
         db.crates.drop()
@@ -32,6 +33,7 @@ class TestAPI(TestCase):
         db.logbook.drop()
         db.current_cabling_map.drop()
         db.tests.drop()
+        db.testpayloads.drop()
         db.cables.drop()
         db.cables_templates.drop()
         db.crates.drop()
@@ -529,6 +531,28 @@ class TestAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json["involved_modules"]),4)
 #################
+    def test_insert_get_delete_testpayload(self):
+        new_log = {
+            "sessionID": "testsession000",
+            "remoteFileList": ['http://cernbox.cern.ch/pippo_pluto','http://cernbox.cern.ch/cappero'],
+            "details": " I tried to insert PS_88 and PS_44. and also PS_1."
+        }
+        response = self.client.post("/testpayloads", json=new_log)
+        self.assertEqual(response.status_code, 201)
+
+        _id = str(response.json["_id"])
+
+        # get it back
+        response = self.client.get("/testpayloads/"+str(_id))
+        self.assertEqual(response.status_code, 200)
+        #delete it
+        response = self.client.delete("/testpayloads/"+str(_id))
+        self.assertEqual(response.status_code, 200)
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

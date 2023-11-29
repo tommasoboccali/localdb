@@ -2,7 +2,7 @@
     "logbook": {
         "type": "object",
         "properties": {
-            "sessionid": {
+            "sessionID": {
                 "type": "string"
             }, 		    
 	    "station":{
@@ -181,6 +181,33 @@
             "Type"
         ]
     },
+    "testpayload":{
+        "type": "object",
+        "properties": {
+            "sessionID": {
+                "type": "string"
+            },
+            "details":{
+                "type": "string"
+            },
+            "localFileList": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "remoteFileList": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
+        "required": [
+            "sessionID",
+            "remoteFileList"
+        ]
+    },
     "tests": {
         "type": "object",
         "properties": {
@@ -207,6 +234,9 @@
             },
             "testResults": {
                 "type": "object"
+            },
+            "testPayloadID": {
+                "type": "string"
             }
         },
         "required": [
